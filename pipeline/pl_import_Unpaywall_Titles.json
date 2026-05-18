@@ -1,0 +1,427 @@
+{
+	"name": "pl_import_Unpaywall_Titles",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load Unpaywall_Titles data from local to Azure",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Unpaywall_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unpaywall_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "revision",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "revision",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "CrossRef_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CrossRef_ID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Use_record",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Use_record",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Indexed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Indexed",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Market",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Market",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Major",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Major",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_TJ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_TJ",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Predatory",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Predatory",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Society",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Society",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "In_Sample",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "In_Sample",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Society_Type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Society_Type",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "Journals_Subjects",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Journals_Subjects",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "No_Data",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "No_Data",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "grouped_issns",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "grouped_issns",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "grouped_sources_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "grouped_sources_id",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Sources_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Sources_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CrossRef_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CrossRef_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "List_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "List_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Major_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Major_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Major_Publisher_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Major_Publisher_OA",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_OA_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_OA_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Title_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "APC_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "APC_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Title_bak",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title_bak",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_Unpaywall_Titles",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywall_Titles",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/02_MSOpenAlex_DOI_Map_StoredProcedure/Import Source Tables"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-17T11:31:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

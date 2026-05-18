@@ -1,0 +1,111 @@
+{
+	"name": "34_ASME_Processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_asme_kbart_csv",
+						"type": "DatasetReference"
+					},
+					"name": "kbart"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_asme_all",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "selectImportFields"
+				},
+				{
+					"name": "activejournal"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          {Original Title ISSN} as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          coverage_notes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> kbart",
+				"activejournal derive(Publisher = :publisher_v,",
+				"          ISSN1 = print_identifier,",
+				"          ISSN2 = online_identifier,",
+				"          Title = publication_title,",
+				"          Source = :source_v,",
+				"          Model = iif(publication_title=='ASME Open Journal of Engineering', 'Fully OA', 'Hybrid'),",
+				"          {Model Notes} = \"\",",
+				"          APC = iif(publication_title=='ASME Open Journal of Engineering', '1950', '3000')",
+				"/* https://www.asme.org/publications-submissions/journals/information-for-authors/open-access */,",
+				"          Currency = :currency_v,",
+				"          {License Types} = :license_type_v,",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = toString(null()),",
+				"          Society = :publisher_v,",
+				"          publisher_v := \"American Society of Mechanical Engineers (ASME)\",",
+				"          source_v := \"Publisher Website via Misc Publisher APCs list\",",
+				"          currency_v := \"USD\",",
+				"          license_type_v := \"CC BY\",",
+				"          year_v := 2025) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectImportFields",
+				"kbart filter(isNull(date_last_issue_online) || date_last_issue_online == '') ~> activejournal",
+				"selectImportFields sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

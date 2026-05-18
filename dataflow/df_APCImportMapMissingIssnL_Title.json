@@ -1,0 +1,153 @@
+{
+	"name": "df_APCImportMapMissingIssnL_Title",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCImportMap"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCTidyISSNLs"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "selectTitle"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedMissingTable"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "APCTidyISSNLs"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "derivedViaSourceTitle"
+				},
+				{
+					"name": "selectMissingTable"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          wUID as long,",
+				"          ISSN as string,",
+				"          ISSN_L as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Publisher as string,",
+				"          PublisherID as string,",
+				"          ISSN_L_via as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 filter(isNull(ISSN_L)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          Title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectTitle",
+				"source1, selectTitle lookup(source1@Title == selectTitle@Title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 derive(Title = source1@Title,",
+				"          ISSN_L = iif(not(isNull(ISSN_L)),ISSN_L,toString(null()))) ~> derivedMissingTable",
+				"derivedMissingTable filter(not(isNull(ISSN_L))) ~> filter2",
+				"source1 select(mapColumn(",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> APCTidyISSNLs",
+				"APCTidyISSNLs, selectMissingTable lookup(APCTidyISSNLs@Title == selectMissingTable@Title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2 derive(ISSN_L = :missing_ISSN_L_V,",
+				"          ISSN_L_via = iif(not(isNull(:missing_ISSN_L_V)) && isNull(:APCTidyISSNl_V),'Title',APCTidyISSNLs@ISSN_L_via)\r",
+				"\r",
+				"/*iif(not(isNull(:missing_ISSN_L_V)) && isNull(source1@ISSN_L_via),'Source_title only',toString(null()))*/,",
+				"          missing_ISSN_L_V := iif(isNull(APCTidyISSNLs@ISSN_L),selectMissingTable@ISSN_L,APCTidyISSNLs@ISSN_L),",
+				"          APCTidyISSNl_V := APCTidyISSNLs@ISSN_L) ~> derivedViaSourceTitle",
+				"filter2 select(mapColumn(",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title = Title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectMissingTable",
+				"derivedViaSourceTitle sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          wUID as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          {Model Notes} as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as string,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Old_Table as string,",
+				"          Old_wUID as string,",
+				"          Old_Year as string,",
+				"          DAO as string,",
+				"          Publisher as string",
+				"     ),",
+				"     partitionFileNames:['MissingIssnl.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkAPCTidyISSNLs"
+			]
+		}
+	}
+}

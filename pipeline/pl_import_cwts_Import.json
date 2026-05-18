@@ -1,0 +1,426 @@
+{
+	"name": "pl_import_cwts_Import",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load into CWTS_Import Table",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "CWTS_Import",
+							"wildcardFileName": "*",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Source title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Print ISSN",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Print_ISSN",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Electronic ISSN",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Electronic_ISSN",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ASJC field IDs",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ASJC_field_IDs",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Citing source",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Citing_source",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "P",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "P",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "IPP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IPP",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "IPP (lower bound)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IPP_lower_bound_",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "IPP (upper bound)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IPP_upper_bound_",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SNIP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SNIP",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SNIP (lower bound)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SNIP_lower_bound_",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "SNIP (upper bound)",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SNIP_upper_bound_",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "% self cit",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "pct_self_cit",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_load_CWTS_Import",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlcwtsImport",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Run CWTS Import pre tidy",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Load into CWTS_Import Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep.CWTS_import_pre_tidy();",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySqlcwtsImport",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Run CWTS Import TIDY",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Run CWTS Import pre tidy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep.CWTS_import_tidy();",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySqlcwtsImport",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Run CWTS L Munge",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Run CWTS Import TIDY",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep.CWTS_L_munge();",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySqlcwtsImport",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/02_MSOpenAlex_DOI_Map_StoredProcedure/Import Source Tables"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-17T11:31:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

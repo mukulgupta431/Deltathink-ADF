@@ -1,0 +1,355 @@
+{
+	"name": "pl_import_MySQLTable_unpaywall_dois_tidy_TABLE",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy last year data to DOI Tidy",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "DOI_tidy_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DOI_tidy_ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Year",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "type_crossref",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "type_crossref",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "sources_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "sources_id",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "sources_id_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "sources_id_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_l_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_l_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "oa_status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "oa_status",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "license",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "license",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Article",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Article",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Articles",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Articles",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "cited_by_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cited_by_count",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "cited_works_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cited_works_count",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Unpaywall_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unpaywall_ID",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "journal_issns",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "journal_issns",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "journal_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "journal_name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "name_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "name_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Idx",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Idx",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Unpaywall_ID_Last_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unpaywall_ID_Last_Year",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "genre",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "genre",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_Unpaywall_DOIs_tidy_TABLE",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywall_DOIs_tidy_TABLE",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/01_MSOpenAlex_DOI_Tidys_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-15T07:46:17Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

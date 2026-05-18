@@ -1,0 +1,122 @@
+{
+	"name": "12_IoPP_Silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy APC",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "BinarySource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "BinaryReadSettings"
+						}
+					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_iopp_apc_from_web",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_iopp_apc_excel",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "conver excel to csv",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Copy APC",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": {
+							"value": "12_IoPP_Bronze_Composer",
+							"type": "Expression"
+						},
+						"type": "NotebookReference"
+					},
+					"snapshot": true
+				},
+				"linkedServiceName": {
+					"referenceName": "dl_oadat_AzureSynapseArtifacts",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Silver processor",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "conver excel to csv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "12_IOPP_Processing",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/Silver_Publisher_Pipelines/Minor"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-01-16T01:37:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

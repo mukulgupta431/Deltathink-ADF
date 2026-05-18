@@ -1,0 +1,118 @@
+{
+	"name": "pl_Import_Export_APC",
+	"properties": {
+		"activities": [
+			{
+				"name": "Tidy",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_APCImport1_mysqlTidy",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Map",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Tidy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_APCImport1_mysqlMap",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "MasterList",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Map",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_APCImport1_mysqlMasterList",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "APCCrosswalk",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "MasterList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_APCImport1_mysqlCrosswalk",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "APCExport",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "APCCrosswalk",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_APCImport1_mysql_Export",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-03-25T04:53:29Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

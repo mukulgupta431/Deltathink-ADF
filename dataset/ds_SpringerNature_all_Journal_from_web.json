@@ -1,0 +1,21 @@
+{
+	"name": "ds_SpringerNature_all_Journal_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_SpringerNature_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/01_SpringerNature"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "springer-cms/rest/v1/content/27651780/data/v5"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

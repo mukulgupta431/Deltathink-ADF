@@ -1,0 +1,395 @@
+{
+	"name": "df_APC_ISSNs",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCImportMap"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCTidyIssnLs"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_issnToissnL",
+						"type": "DatasetReference"
+					},
+					"name": "sourceissnToissnL"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Tidy",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCTidy"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_APC_ISSNs",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCIssns"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Tidy",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCTidy"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "aggregate2"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "aggregate3"
+				},
+				{
+					"name": "select6"
+				},
+				{
+					"name": "union2"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "UpdateAPCTidywithnewISSNL"
+				},
+				{
+					"name": "selectColumnsOfAPCTidy"
+				},
+				{
+					"name": "selectwUIDAndISSNl"
+				},
+				{
+					"name": "filter4"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "aggregate4"
+				},
+				{
+					"name": "select7"
+				},
+				{
+					"name": "filter5"
+				},
+				{
+					"name": "filter6"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          wUID as long,",
+				"          ISSN as string,",
+				"          ISSN_L as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Publisher as string,",
+				"          PublisherID as string,",
+				"          ISSN_L_via as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCTidyIssnLs",
+				"source(output(",
+				"          ISSN as string,",
+				"          ISSN_L as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceissnToissnL",
+				"source(output(",
+				"          APC_ID as long,",
+				"          Title_ID as string,",
+				"          ISSN_L as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Publisher_OA_type as string,",
+				"          Unique_title as string,",
+				"          wUID as long,",
+				"          Import1ID as string,",
+				"          Import2ID as string,",
+				"          Publisher as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          Model_Notes as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as short,",
+				"          DAO as short,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Import1_Old_Table as string,",
+				"          Import1_Old_wUID as string,",
+				"          Import1_Old_Year as string,",
+				"          Present_via as string,",
+				"          Import2_Old_Table as string,",
+				"          Import2_Old_wUID as string,",
+				"          Import2_Old_Year as string,",
+				"          ISSN_X as string,",
+				"          ISSNs_in_order as string,",
+				"          IY as string,",
+				"          IYP as string,",
+				"          Publication_Data_Year as short,",
+				"          Metrics_Data_Year as short,",
+				"          Currency_Data_Year as short,",
+				"          Inflation_Data_Year as short,",
+				"          last_year_APC as string,",
+				"          years_zero_APC as boolean,",
+				"          last_year_model as string,",
+				"          next_year_model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+				"derivedColumn2 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sourceAPCTidyIssnLs derive(APC_ID = wUID) ~> derivedColumn2",
+				"sourceAPCTidyIssnLs, sourceissnToissnL join(sourceAPCTidyIssnLs@ISSN_L == sourceissnToissnL@ISSN_L,",
+				"     joinType:'right',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"filter1 derive(APC_ID = wUID) ~> derivedColumn3",
+				"join1 filter(not(isNull(sourceAPCTidyIssnLs@ISSN_L))) ~> filter1",
+				"derivedColumn3 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN = sourceissnToissnL@ISSN,",
+				"          ISSN_L = sourceissnToissnL@ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 aggregate(groupBy(APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L),",
+				"     cnt = count(wUID)) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select1 aggregate(groupBy(APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L),",
+				"     cnt = count(wUID)) ~> aggregate2",
+				"aggregate2 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select4, select3 union(byName: true)~> union1",
+				"sourceAPCTidyIssnLs, sourceissnToissnL join(sourceAPCTidyIssnLs@ISSN == sourceissnToissnL@ISSN,",
+				"     joinType:'right',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 filter(not(isNull(sourceAPCTidyIssnLs@ISSN))) ~> filter2",
+				"filter2 derive(APC_ID = wUID) ~> derivedColumn4",
+				"derivedColumn4 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN = sourceissnToissnL@ISSN,",
+				"          ISSN_L = sourceissnToissnL@ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"select5 aggregate(groupBy(APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L),",
+				"     cnt = count(wUID)) ~> aggregate3",
+				"aggregate3 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"union1, select6 union(byName: true)~> union2",
+				"union2 sort(asc(ISSN_L, false)) ~> sort1",
+				"sort1 filter(not(isNull(ISSN)) || ISSN != '0000-0000'",
+				"",
+				"/* not(isNull(ISSN)) || not(isNull(ISSN_L)) || ISSN != '0000-0000' || regexMatch(ISSN,'[0-9]{4}-[0-9]{3}[0-9X]') */) ~> filter3",
+				"lookup1 derive(ISSN_L = TidyIssnL_ISSN_L) ~> UpdateAPCTidywithnewISSNL",
+				"UpdateAPCTidywithnewISSNL select(mapColumn(",
+				"          APC_ID,",
+				"          Title_ID,",
+				"          ISSN_L,",
+				"          Publisher_Short,",
+				"          Publisher_Short_OA,",
+				"          Publisher_OA_type,",
+				"          Unique_title,",
+				"          wUID,",
+				"          Import1ID,",
+				"          Import2ID,",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source_title,",
+				"          Source,",
+				"          Model,",
+				"          Model_Notes,",
+				"          APC,",
+				"          Currency,",
+				"          Year,",
+				"          DAO,",
+				"          LicenseType,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society,",
+				"          TJ,",
+				"          Audit,",
+				"          Import1_Old_Table,",
+				"          Import1_Old_wUID,",
+				"          Import1_Old_Year,",
+				"          Present_via,",
+				"          Import2_Old_Table,",
+				"          Import2_Old_wUID,",
+				"          Import2_Old_Year,",
+				"          ISSN_X,",
+				"          ISSNs_in_order,",
+				"          IY,",
+				"          IYP,",
+				"          Publication_Data_Year,",
+				"          Metrics_Data_Year,",
+				"          Currency_Data_Year,",
+				"          Inflation_Data_Year,",
+				"          last_year_APC,",
+				"          years_zero_APC,",
+				"          last_year_model,",
+				"          next_year_model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumnsOfAPCTidy",
+				"filter4 select(mapColumn(",
+				"          TidyIssnL_wUID = wUID,",
+				"          TidyIssnL_ISSN_L = ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectwUIDAndISSNl",
+				"sourceAPCTidyIssnLs filter(not(isNull(ISSN_L))) ~> filter4",
+				"sourceAPCTidy, selectwUIDAndISSNl lookup(wUID == TidyIssnL_wUID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"filter5 aggregate(groupBy(APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L),",
+				"     cnt = count(wUID)) ~> aggregate4",
+				"aggregate4 select(mapColumn(",
+				"          APC_ID,",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select7",
+				"filter6 filter(regexMatch(ISSN, '^[0-9]{4}-[0-9]{3}[0-9X]$')) ~> filter5",
+				"filter3 filter(not(isNull(ISSN_L))) ~> filter6",
+				"select7 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['APC_Issns.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkAPCIssns",
+				"selectColumnsOfAPCTidy sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['APCTidy.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkAPCTidy"
+			]
+		}
+	}
+}

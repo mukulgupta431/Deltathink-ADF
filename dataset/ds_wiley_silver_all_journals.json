@@ -1,0 +1,27 @@
+{
+	"name": "ds_wiley_silver_all_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/02_Silver layer/04_wiley"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "silver/wiley/all",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

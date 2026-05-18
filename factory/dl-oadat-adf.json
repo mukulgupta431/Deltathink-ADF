@@ -1,0 +1,15 @@
+{
+	"name": "dl-oadat-adf",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Enabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4f32df57-bbfc-4b42-b965-c4927c75ba1c",
+		"tenantId": "8cfa71aa-2b7f-4bbe-80ac-681ce3bc5c59"
+	}
+}

@@ -1,0 +1,45 @@
+{
+	"name": "ds_copernicus_issn_mapping",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/30_Copernicus"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "issn_mapping.csv",
+				"folderPath": "bronze/Copernicus Publications/issn_mapping",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ISSN1",
+				"type": "String"
+			},
+			{
+				"name": "ISSN2",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Publisher ID",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

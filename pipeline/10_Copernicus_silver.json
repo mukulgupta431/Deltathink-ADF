@@ -1,0 +1,37 @@
+{
+	"name": "10_Copernicus_silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "process_silver",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "30_copernicus_processing",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/Silver_Publisher_Pipelines/Minor"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-02T05:06:50Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

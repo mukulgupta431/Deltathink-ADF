@@ -1,0 +1,307 @@
+{
+	"name": "27_df_BMJ_processing_copy1",
+	"properties": {
+		"folder": {
+			"name": "apc/abkup"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_BMJ_bronze_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "sourceKbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_BMJ_bronze_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceHybrid"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_BMJ_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOAJournal"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_BMJ_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_BMJ_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PreparingList1"
+				},
+				{
+					"name": "selectRequiredColumns"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "flatten2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as short,",
+				"          num_first_vol_online as short,",
+				"          num_first_issue_online as short,",
+				"          date_last_issue_online as short,",
+				"          num_last_vol_online as short,",
+				"          num_last_issue_online as short,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as string,",
+				"          access_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceKbart",
+				"source(output(",
+				"          journal as (title as string, title_url as string, APC as string, currency as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> sourceHybrid",
+				"source(output(",
+				"          journal as (APC as short, Online_ISSN as string, Print_ISSN as string, currency as string, title as string, title_url as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> sourceOAJournal",
+				"sourceKbart derive(Publisher = 'BMJ Group',",
+				"          ISSN1 = trim(online_identifier),",
+				"          ISSN2 = trim(print_identifier),",
+				"          Title = trim(replace(replace(publication_title,' *',''),'&','and'))",
+				"",
+				"/* TRIM(SUBSTITUTE(SUBSTITUTE([@[publication_title]],\" *\",\"\"),\" & \",\" and \"))*/,",
+				"          Source = 'Publisher Price List',",
+				"          Model = toString(null()),",
+				"          {Model Notes} = toString(null()),",
+				"          APC = toString(null()),",
+				"          Currency = toString(null()),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025') ~> PreparingList1",
+				"PreparingList1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"derivedColumn3 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = derivedColumn1@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency = derivedColumn1@Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sourceHybrid foldDown(unroll(journal),",
+				"     mapColumn(",
+				"          title = journal.title,",
+				"          title_url = journal.title_url,",
+				"          APC = journal.APC,",
+				"          currency = journal.currency",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"sourceOAJournal foldDown(unroll(journal),",
+				"     mapColumn(",
+				"          title = journal.title,",
+				"          Online_ISSN = journal.Online_ISSN,",
+				"          Print_ISSN = journal.Print_ISSN,",
+				"          APC = journal.APC,",
+				"          currency = journal.currency,",
+				"          title_url = journal.title_url",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten2",
+				"lookup1 derive(Publisher = 'BMJ Group',",
+				"          ISSN1 = ISSN1,",
+				"          ISSN2 = ISSN2,",
+				"          Title = trim(replace(replace(flatten1@title,' *',''),'&','and'))\r",
+				"\r",
+				"/* TRIM(SUBSTITUTE(SUBSTITUTE([@[publication_title]],\" *\",\"\"),\" & \",\" and \"))*/\r",
+				"/* trim(flatten1@title) */,",
+				"          Source = 'Publisher Price List',",
+				"          Model = 'Hybrid',",
+				"          {Model Notes} = toString(null()),",
+				"          APC = flatten1@APC,",
+				"          Currency = iif(isNull(flatten1@APC),'',flatten1@currency),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = PublisherID,",
+				"          JoiningID = JoiningID,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025') ~> derivedColumn1",
+				"derivedColumn4, selectRequiredColumns lookup(soundex(upper(trim(flatten1@title)))/* soundex(upper(trim(flatten1@title))) */ == soundex(upper(trim(selectRequiredColumns@Title))),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"flatten2 derive(Publisher = 'BMJ Group',",
+				"          ISSN1 = Online_ISSN,",
+				"          ISSN2 = Print_ISSN,",
+				"          Title = trim(replace(replace(title,' *',''),'&','and'))\r",
+				"/* trim(title)*/,",
+				"          Source = 'Publisher Price List',",
+				"          Model = 'Fully OA',",
+				"          {Model Notes} = toString(null()),",
+				"          APC = toString(APC),",
+				"          Currency = currency,",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = Online_ISSN,",
+				"          JoiningID = Online_ISSN,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025') ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = derivedColumn2@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency = derivedColumn2@Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, select2 union(byName: true)~> union1",
+				"derivedColumn1 derive(ISSN1 = case(flatten1@title == 'Archives of disease in childhood','1468-2044',\r",
+				"     case(flatten1@title =='British Journal of Ophthalmology','1468-2079',\r",
+				"            case(flatten1@title =='British Journal of Sports Medicine','1473-0480',\r",
+				"          case(flatten1@title =='Evidence-Based Nursing','1468-9618',\r",
+				"          case(flatten1@title =='Considerations in Medicine','2515-3927',\r",
+				"          ISSN1\r",
+				"                )\r",
+				"        )\r",
+				"    )\r",
+				"    )\r",
+				"    ),",
+				"          ISSN2 = case(flatten1@title == 'Archives of disease in childhood','1468-2044',\r",
+				"     case(flatten1@title =='British Journal of Ophthalmology','1468-2079',\r",
+				"            case(flatten1@title =='British Journal of Sports Medicine','1473-0480',\r",
+				"          case(flatten1@title =='Evidence-Based Nursing','1468-9618',\r",
+				"          case(flatten1@title =='Considerations in Medicine','2515-3927',\r",
+				"          ISSN2\r",
+				"                )\r",
+				"        )\r",
+				"    )\r",
+				"    )\r",
+				"    )) ~> derivedColumn3",
+				"flatten1 derive(Title = trim(replace(replace(title,' *',''),'&','and'))) ~> derivedColumn4",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal",
+				"union1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

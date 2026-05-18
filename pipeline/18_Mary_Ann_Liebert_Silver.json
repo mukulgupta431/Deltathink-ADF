@@ -1,0 +1,78 @@
+{
+	"name": "18_Mary_Ann_Liebert_Silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "conver excel to csv",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": {
+							"value": "18_Mary_Ann_Liebert_Bronse_Composer",
+							"type": "Expression"
+						},
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": {
+							"value": "oadatSparkPook",
+							"type": "Expression"
+						},
+						"type": "BigDataPoolReference"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "dl_oadat_AzureSynapseArtifacts",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Populate silver data",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "conver excel to csv",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "18_Mary_Ann_Liebert",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/Silver_Publisher_Pipelines/Minor"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-19T07:17:07Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

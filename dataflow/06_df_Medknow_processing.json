@@ -1,0 +1,143 @@
+{
+	"name": "06_df_Medknow_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_Medknow_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournal"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Medknow_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PreparingList1"
+				},
+				{
+					"name": "selectRequiredColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Title as string,",
+				"          Language as string,",
+				"          PeerReviewed as boolean,",
+				"          Affiliation as string,",
+				"          Abbreviation as string,",
+				"          {Print ISSN} as string,",
+				"          {E-ISSN} as string,",
+				"          DOI as string,",
+				"          Frequency as string,",
+				"          Category as string,",
+				"          Subject as string,",
+				"          Readership as string,",
+				"          {Volume in 2024} as string,",
+				"          Embargo13 as string,",
+				"          ImpactFactor as string,",
+				"          {Web URL} as string,",
+				"          {Back issues} as string,",
+				"          {Manuscript Submission URL} as string,",
+				"          {Full Text availability} as short,",
+				"          {Subscriptions Rate individual (INR)-Print} as string,",
+				"          {Subscriptions Rate institutional (INR)-Print} as string,",
+				"          {Subscriptions Rate individual (US$)-Print} as string,",
+				"          {Subscriptions Rate institutional (US$)-Print} as string,",
+				"          {Subscriptions Rate individual (INR)-Print (Combo Sale)} as string,",
+				"          {Subscriptions Rate institutional (INR)-Print (Combo Sale)} as string,",
+				"          {Subscriptions Rate individual (US$)-Print (Combo Sale)} as string,",
+				"          {Subscriptions Rate institutional (US$)-Print (Combo Sale)} as string,",
+				"          {Subscriptions Rate individual (INR)-Online (Combo Sale)} as string,",
+				"          {Subscriptions Rate institutional (INR)-Online (Combo Sale)} as string,",
+				"          {Subscriptions Rate individual (US$)-Online (Combo Sale)} as string,",
+				"          {Subscriptions Rate institutional (US$)-Online (Combo Sale)} as string,",
+				"          Embargo31 as string,",
+				"          AccessDetails as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournal",
+				"sourceAllJournal derive(Publisher = :publisher_v,",
+				"          ISSN1 = replace(replace(trim({E-ISSN}),\"Awaited\",\"\"),\"NA\",\"\")",
+				"",
+				"/* =SUBSTITUTE(SUBSTITUTE(TRIM([@[ E-ISSN]]),\"Awaited\",\"\"),\"NA\",\"\") */,",
+				"          ISSN2 = replace(replace(trim({Print ISSN}),\"Awaited\",\"\"),\"NA\",\"\"),",
+				"          Title = replace(trim(Title),\"#39;\",\"\")",
+				"",
+				"/* =TRIM(SUBSTITUTE([@[Journal Name]],\"#39;\",\"\")) */,",
+				"          Source = :source_v,",
+				"          Model = \"Fully OA\",",
+				"          {Model Notes} = toString(null()),",
+				"          APC = {Subscriptions Rate individual (US$)-Print},",
+				"          Currency = iif(not(isNull({Subscriptions Rate individual (US$)-Print})),'USD',''),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = trim(Abbreviation),",
+				"          JoiningID = trim(Abbreviation),",
+				"          Imprint = 'Medknow',",
+				"          Society = replace(replace(trim(Affiliation),'-',''),\"&quot;\",\"\")",
+				"",
+				"/* =SUBSTITUTE(IF([@[ Affiliation]]<>\"-\",TRIM([@[ Affiliation]]),\"\"),\"&quot;\",\"\") */,",
+				"          year_v := '2025',",
+				"          publisher_v := 'Wolters Kluwer Health',",
+				"          source_v := 'Publisher Web Site') ~> PreparingList1",
+				"PreparingList1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Coden as string,",
+				"          Publication as string,",
+				"          {First Year of Publication*} as string,",
+				"          {Open Access Options? acsopenscience.org} as string,",
+				"          {Access Method for non-OA Content} as string,",
+				"          {First Year Available with a Front-File Subscription**} as string,",
+				"          URL as string,",
+				"          {Issues Per Year Online} as string,",
+				"          {Print ISSN} as string,",
+				"          {Print Svc Code} as string,",
+				"          {Web ISSN} as string,",
+				"          {Included in All Publications Package} as string,",
+				"          {Included in ACS Core Plus Package} as string,",
+				"          {Optional in Science Essentials Package} as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal"
+			]
+		}
+	}
+}

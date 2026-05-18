@@ -1,0 +1,21 @@
+{
+	"name": "ds_ieee_titlelist_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_open_ieee_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/20_IEEE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/wp-content/uploads/IEEE-Title-List-September-2024.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

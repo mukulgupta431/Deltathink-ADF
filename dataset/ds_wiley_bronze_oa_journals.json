@@ -1,0 +1,64 @@
+{
+	"name": "ds_wiley_bronze_oa_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/04_wiley"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/wiley/oa",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Journal Name",
+				"type": "String"
+			},
+			{
+				"name": "Subject Area",
+				"type": "String"
+			},
+			{
+				"name": "Online ISSN",
+				"type": "String"
+			},
+			{
+				"name": "License Types Offered",
+				"type": "String"
+			},
+			{
+				"name": "USD",
+				"type": "String"
+			},
+			{
+				"name": "GBP",
+				"type": "String"
+			},
+			{
+				"name": "EUR",
+				"type": "String"
+			},
+			{
+				"name": "clean_title",
+				"type": "String"
+			},
+			{
+				"name": "issnl",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,21 @@
+{
+	"name": "ds_sage_gold_oa_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sagepub_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/17_SAGE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "sites/default/files/2025goldoa25_goldoa25_gold_oa_2025_list.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

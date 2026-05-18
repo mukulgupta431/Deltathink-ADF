@@ -1,0 +1,136 @@
+{
+	"name": "18_Mary_Ann_Liebert",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver/Misc"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_marry_ann_bronze_all",
+						"type": "DatasetReference"
+					},
+					"name": "AllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_mary_ann_broze_oa",
+						"type": "DatasetReference"
+					},
+					"name": "OAJournal"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ls_marry_ann__silver_all_journal",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAllJournal"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupOAJournal"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PubType as string,",
+				"          Title as string,",
+				"          OnlineUrl as string,",
+				"          OnlineYear as double,",
+				"          FirstVolume as double,",
+				"          OnlineCode as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> AllJournal",
+				"source(output(",
+				"          title as string,",
+				"          APC as short,",
+				"          Currency as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> OAJournal",
+				"filter1, OAJournal lookup(AllJournal@Title == OAJournal@title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupOAJournal",
+				"lookupOAJournal derive(Publisher = \"Mary Ann Liebert\",",
+				"          ISSN1 = OnlineCode,",
+				"          ISSN2 = toString(null()),",
+				"          Title = AllJournal@Title,",
+				"          Source = \"Publisher Website via Misc Publisher APCs list\",",
+				"          Model = :model_v,",
+				"          {Model Notes} = toString(null()),",
+				"          APC = iif(isNull(APC),iif(PubType == 'Trade Magazine','','3600'),toString(APC))",
+				"",
+				"/* Pl. validate the default hybrid APC 3600 with Delta Think team before executing this flow */,",
+				"          Currency = iif(PubType == 'Trade Magazine','','USD'),",
+				"          {License Types} = iif(isNull(:model_v),'','CC BY'),",
+				"          Year = '2025',",
+				"          PublisherID = substringIndex(OnlineUrl,'/',-1),",
+				"          JoiningID = substringIndex(OnlineUrl,'/',-1),",
+				"          Imprint = toString(null()),",
+				"          Society = iif(OnlineCode == '2689-4653', 'Androgens Society', ",
+				"    iif(OnlineCode == '2768-3222','Academy of Integrative Health & Medicine (AIHM)',",
+				"    iif(OnlineCode == '2689-288X','National Neurotrauma Society, European Neurotrauma Organization',",
+				"    iif(OnlineCode == '2162-1934','Wound Healing Society',",
+				"    iif(OnlineCode == '2151-1136','Edourological Society',''",
+				"    ))))),",
+				"          model_v := iif(not(isNull(OAJournal@title)),",
+				"    'Fully OA',",
+				"    iif(PubType == 'Trade Magazine','None','Hybrid')",
+				"    )) ~> derivedColumn1",
+				"AllJournal filter(PubType == 'Journal' || PubType == 'Trade Magazine') ~> filter1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = derivedColumn1@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          PubType as string,",
+				"          Title as string,",
+				"          OnlineUrl as string,",
+				"          OnlineYear as string,",
+				"          FirstVolume as string,",
+				"          OnlineCode as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAllJournal"
+			]
+		}
+	}
+}

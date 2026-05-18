@@ -1,0 +1,89 @@
+{
+	"name": "ds_ms_doi_tidy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing/OpenAlex"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed_v1/doi_tidy",
+				"fileSystem": "openalex"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "DOI_tidy_ID",
+				"type": "INT64"
+			},
+			{
+				"name": "year",
+				"type": "UTF8"
+			},
+			{
+				"name": "type",
+				"type": "UTF8"
+			},
+			{
+				"name": "type_crossref",
+				"type": "UTF8"
+			},
+			{
+				"name": "sources_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "sources_id_as_stated",
+				"type": "UTF8"
+			},
+			{
+				"name": "issn_l",
+				"type": "UTF8"
+			},
+			{
+				"name": "issn_l_as_stated",
+				"type": "UTF8"
+			},
+			{
+				"name": "oa_status",
+				"type": "UTF8"
+			},
+			{
+				"name": "license",
+				"type": "UTF8"
+			},
+			{
+				"name": "version",
+				"type": "UTF8"
+			},
+			{
+				"name": "host_type",
+				"type": "UTF8"
+			},
+			{
+				"name": "Is_Article",
+				"type": "INT32"
+			},
+			{
+				"name": "Articles",
+				"type": "INT64"
+			},
+			{
+				"name": "cited_by_count",
+				"type": "INT64"
+			},
+			{
+				"name": "cited_works_count",
+				"type": "INT64"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

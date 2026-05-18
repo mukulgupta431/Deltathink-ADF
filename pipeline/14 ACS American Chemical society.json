@@ -1,0 +1,123 @@
+{
+	"name": "14 ACS American Chemical society",
+	"properties": {
+		"activities": [
+			{
+				"name": "Generate ACS Data from excel and website",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": {
+							"value": "14_ACS_Bronze_Composer",
+							"type": "Expression"
+						},
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": {
+							"value": "oadatSparkPook",
+							"type": "Expression"
+						},
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
+				},
+				"linkedServiceName": {
+					"referenceName": "dl_oadat_AzureSynapseArtifacts",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Populate Silver data",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Generate ACS Data from excel and website",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "14_df_ACS_processing",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "Data cleanup",
+				"type": "SynapseNotebook",
+				"dependsOn": [
+					{
+						"activity": "Populate Silver data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": {
+							"value": "14_ACS_Siver_DataCleanup",
+							"type": "Expression"
+						},
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": {
+							"value": "oadatSparkPook",
+							"type": "Expression"
+						},
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
+				},
+				"linkedServiceName": {
+					"referenceName": "dl_oadat_AzureSynapseArtifacts",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/Silver_Publisher_Pipelines/Major"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-01-13T10:03:16Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

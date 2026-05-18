@@ -1,0 +1,248 @@
+{
+	"name": "16_df_emerald_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_bronze_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "sourceKbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_bronze_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceHybrid"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOA"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_bronze_FOA_additional",
+						"type": "DatasetReference"
+					},
+					"name": "sourceFOAAdditional"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_emerald_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "lookupPlatinumOA"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "unionFOAAdditional"
+				},
+				{
+					"name": "filterNonSerial"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as short,",
+				"          num_first_vol_online as short,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as short,",
+				"          num_last_vol_online as short,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as string,",
+				"          access_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceKbart",
+				"source(output(",
+				"          journal_name as string,",
+				"          journal_url as string,",
+				"          price_GBP as string,",
+				"          price_USD as string,",
+				"          price_EUR as string,",
+				"          issn as string,",
+				"          eissn as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceHybrid",
+				"source(output(",
+				"          Title as string,",
+				"          ISSN as string,",
+				"          URL as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOA",
+				"source(output(",
+				"          {Full Title} as string,",
+				"          ISSN as string,",
+				"          {Unformatted ISSN} as string,",
+				"          {Product ID} as string,",
+				"          {Change History} as string,",
+				"          {Shortcut URL} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceFOAAdditional",
+				"lookupPlatinumOA derive(Publisher = :publisher_V,",
+				"          ISSN1 = trim(online_identifier),",
+				"          ISSN2 = trim(print_identifier),",
+				"          Title = trim(publication_title),",
+				"          Source = :source_v,",
+				"          Model = :Model_v",
+				"/* if the journal is found in platinum(OA) then model is \"Fully OA\" otherwise \"Hybrid\" */,",
+				"          {Model Notes} = iif(:Model_v == \"Fully OA\",\"Platinum journal\",'')",
+				"/* if the journal is found in platinum(OA) then model is \"Fully OA\" and model notes as \"Platinum journal\" */,",
+				"          APC = :APC_v         ",
+				"/* APC is 3874 for all List1 Journals (Platinum and KBART);",
+				"   APC for 2025 : 4,105",
+				"    for all other journals refer Hybrid sheet. For latest \"Article processing charges\" refer https://www.emeraldgrouppublishing.com/publish-with-us/publish-open-access/journal#apc-charges*/,",
+				"          Currency = 'USD',",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025',",
+				"          Model_v := case(not(isNull(ISSN)),\"Fully OA\",'Hybrid'),",
+				"          publisher_V := 'Emerald Publishing',",
+				"          source_v := 'Publisher Price List',",
+				"          APC_v := 4105) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"filterNonSerial, derivedColumn3 lookup(title_id == JoiningID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupPlatinumOA",
+				"sourceHybrid derive(Publisher = :publisher_V,",
+				"          ISSN1 = trim(eissn),",
+				"          ISSN2 = trim(issn),",
+				"          Title = trim(issn),",
+				"          Source = :source_v,",
+				"          Model = \"Hybrid\",",
+				"          {Model Notes} = toString(null()),",
+				"          APC = translate(price_USD, '$,',''),",
+				"          Currency = 'USD',",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = substringIndex(journal_url, '/', -1),",
+				"          JoiningId = substringIndex(journal_url, '/', -1),",
+				"          Imprint = 'ICE Publishing',",
+				"          Society = toString(null()),",
+				"          year_v := '2025',",
+				"          publisher_V := 'Emerald Publishing',",
+				"          source_v := 'Publisher Price List') ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningId,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"sourceOA derive(JoiningID = substringIndex(URL, '/', -1)) ~> derivedColumn3",
+				"select2, sourceFOAAdditional union(byName: true)~> unionFOAAdditional",
+				"sourceKbart filter(publication_type == 'Serial' && isNull(date_last_issue_online)) ~> filterNonSerial",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal",
+				"unionFOAAdditional sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList2"
+			]
+		}
+	}
+}

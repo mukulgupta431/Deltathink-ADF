@@ -1,0 +1,129 @@
+{
+	"name": "22_optic_process",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver/Misc"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_optic_bronze_journal",
+						"type": "DatasetReference"
+					},
+					"name": "opticJournals"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_optic_price",
+						"type": "DatasetReference"
+					},
+					"name": "opticPrice"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_optic_silver_all",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          journals as (title as string, title_url as string, ISSN as string, eISSN as string, CODEN as string, open_access as boolean)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> opticJournals",
+				"source(output(",
+				"          code as string,",
+				"          title as string,",
+				"          APC as string,",
+				"          currency as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> opticPrice",
+				"opticJournals foldDown(unroll(journals),",
+				"     mapColumn(",
+				"          title = journals.title,",
+				"          title_url = journals.title_url,",
+				"          ISSN = journals.ISSN,",
+				"          eISSN = journals.eISSN,",
+				"          CODEN = journals.CODEN,",
+				"          open_access = journals.open_access",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1, opticPrice lookup(CODEN == code,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 derive(Publisher = \"Optica (OSA)\",",
+				"          ISSN1 = eISSN,",
+				"          ISSN2 = ISSN,",
+				"          Title = flatten1@title,",
+				"          Source = \"Publisher Website via Misc Publisher APCs list\",",
+				"          Model = iif(open_access,'Fully OA','None'),",
+				"          {Model Notes} = toString(null()),",
+				"          APC = APC,",
+				"          Currency = currency,",
+				"          {License Types} = \"CC BY, Publisher's Own\",",
+				"          Year = '2025',",
+				"          PublisherID = CODEN,",
+				"          JoiningID = CODEN,",
+				"          Imprint = toString(null()),",
+				"          Society = iif(flatten1@title == 'Chinese Optics Letters', 'Chinese Laser Press', ",
+				"    iif(flatten1@title == 'Current Optics and Photonics','Optical Society of Korea',",
+				"    iif(flatten1@title == 'Journal of Optical Communications and Networking','IEEE',",
+				"    iif(flatten1@title == 'Journal of Optical Technology','Vavilov State Optical Institute',",
+				"    iif(flatten1@title == 'Photonics Research','Chinese Laser Press','Optical Society of America '",
+				"    )))))) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = derivedColumn1@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency = derivedColumn1@Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

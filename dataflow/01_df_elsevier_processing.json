@@ -1,0 +1,225 @@
+{
+	"name": "01_df_elsevier_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_elsevier_bronze_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "sourceKbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_elsevier_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournals"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_elsevier_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOAJournals"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_elsevier_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAllJournalsList1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_elsevier_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkOAJournalsList2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as short,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as short,",
+				"          date_monograph_published_online as date,",
+				"          monograph_volume as short,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as integer,",
+				"          access_type as string,",
+				"          supplement as string,",
+				"          title_change_history as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceKbart",
+				"source(output(",
+				"          {Full Title} as string,",
+				"          ISSN as string,",
+				"          {Unformatted ISSN} as string,",
+				"          {Product ID} as string,",
+				"          {Change History} as string,",
+				"          {Shortcut URL} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournals",
+				"source(output(",
+				"          ISSN as string,",
+				"          Title as string,",
+				"          {Business model} as string,",
+				"          USD as string,",
+				"          EUR as string,",
+				"          GBP as string,",
+				"          JPY as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOAJournals",
+				"lookup1 derive(Publisher = 'Elsevier',",
+				"          ISSN1 = :Issn_v,",
+				"          ISSN2 = toString(null()),",
+				"          Title = {Full Title},",
+				"          Source = 'Publisher Price List',",
+				"          Model = case(",
+				"    :kbart_oa_Comp_v_final == 'OC',",
+				"    'Fully OA',",
+				"    case(",
+				"        :kbart_oa_Comp_v_final == 'O',",
+				"         'Hybrid',",
+				"         ''",
+				"        )",
+				")",
+				"/* Model = =_xlfn.SWITCH([@[OA + Comp]],\"OC\",\"Fully OA\",\"O\",\"Hybrid\",\"\") */,",
+				"          {Model Notes} = toString(:kbart_comp_title_V),",
+				"          APC = toString(null()),",
+				"          Currency = toString(null()),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = {Product ID},",
+				"          JoiningID = :Issn_v,",
+				"          Imprint = publisher_name,",
+				"          Society = toString(null()),",
+				"          year_v := '2025',",
+				"          Issn_v := lpad(concat(concat(left(ISSN,4),'-'),right(ISSN,4)),9,'0'),",
+				"          KbartOa_Comp := iif(like(notes, '%Open Access%'),'O',toString(null())),",
+				"          kbart_comp_title_V := iif(like(notes, '%Complimentary title%'),'Complimentary title',toString(null())),",
+				"          kbart_oa_Comp_v_final := concat(coalesce(left(:KbartOa_Comp,1),''),coalesce(left(:kbart_comp_title_V,1),''))) ~> derivedColumn1",
+				"sourceAllJournals, sourceKbart lookup({Unformatted ISSN} == title_id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"sourceOAJournals derive(Publisher = 'Elsevier',",
+				"          ISSN1 = ISSN,",
+				"          ISSN2 = toString(null()),",
+				"          Title = Title,",
+				"          Source = 'Publisher Price List',",
+				"          Model = case({Business model}==\"Open Access\",\"Fully OA\",trim({Business model})),",
+				"          {Model Notes} = toString(null()),",
+				"          APC = USD,",
+				"          Currency = 'USD',",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = ISSN,",
+				"          JoiningID = ISSN,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025') ~> derivedColumn2",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAllJournalsList1",
+				"select2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkOAJournalsList2"
+			]
+		}
+	}
+}

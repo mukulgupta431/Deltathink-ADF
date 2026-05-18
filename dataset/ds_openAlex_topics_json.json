@@ -1,0 +1,27 @@
+{
+	"name": "ds_openAlex_topics_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "openAlex"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part_000.gz",
+				"folderPath": "topics/updated_date=2025-07-07",
+				"fileSystem": "openalex"
+			},
+			"compression": {
+				"type": "gzip"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

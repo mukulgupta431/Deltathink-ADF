@@ -1,0 +1,54 @@
+{
+	"name": "ds_optic_bronze_journal",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/Misc/22 Optic"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Optic_journals.json",
+				"folderPath": "bronze/Optica (OSA)/all",
+				"fileSystem": "apc"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"journals": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"title": {
+								"type": "string"
+							},
+							"title_url": {
+								"type": "string"
+							},
+							"ISSN": {
+								"type": "null"
+							},
+							"eISSN": {
+								"type": "string"
+							},
+							"CODEN": {
+								"type": "string"
+							},
+							"open_access": {
+								"type": "boolean"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

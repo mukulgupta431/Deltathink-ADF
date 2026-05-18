@@ -1,0 +1,73 @@
+{
+	"name": "ds_ms_Unpaywall_DOIs_tidy_TABLE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "OADAT_dataprep_Unpaywall_DOIs_tidy_20250915_1245GMT+5:30.csv",
+				"folderPath": "Unpaywall_DOIs_tidy",
+				"fileSystem": "general"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Idx",
+				"type": "String"
+			},
+			{
+				"name": "Name_Raw",
+				"type": "String"
+			},
+			{
+				"name": "Name_Match",
+				"type": "String"
+			},
+			{
+				"name": "Name_Punct",
+				"type": "String"
+			},
+			{
+				"name": "Name_Abbrev",
+				"type": "String"
+			},
+			{
+				"name": "Name_Clean",
+				"type": "String"
+			},
+			{
+				"name": "Name_Abbrev_OLD",
+				"type": "String"
+			},
+			{
+				"name": "Source",
+				"type": "String"
+			},
+			{
+				"name": "Notes",
+				"type": "String"
+			},
+			{
+				"name": "done",
+				"type": "String"
+			},
+			{
+				"name": "bak",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,68 @@
+{
+	"name": "dataflowTestMysql",
+	"properties": {
+		"folder": {
+			"name": "generic"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureMySqlTableApcImport1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'call oadat_dataprep.test_createTable_procedure()',",
+				"     format: 'query') ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          APC_ID as string,",
+				"          ISSN_L as string,",
+				"          Title_ID as string,",
+				"          Source_title as string,",
+				"          Title as string,",
+				"          Publisher as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Year as string,",
+				"          Model as string,",
+				"          APC as string,",
+				"          Source_title_history as string,",
+				"          Title_history as string,",
+				"          Publisher_history as string,",
+				"          Publisher_history_OA as string,",
+				"          Year_history as string,",
+				"          ID_history as string,",
+				"          wUID as string,",
+				"          Contiguous as string,",
+				"          Updates as string,",
+				"          Child_records as string,",
+				"          Change_publisher as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

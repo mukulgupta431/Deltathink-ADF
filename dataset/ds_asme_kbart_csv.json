@@ -1,0 +1,93 @@
+{
+	"name": "ds_asme_kbart_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/34_ASME"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "kbart.csv",
+				"folderPath": "bronze/American Society of Mechanical Engineers (ASME)/kbart",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "publication_title",
+				"type": "String"
+			},
+			{
+				"name": "print_identifier",
+				"type": "String"
+			},
+			{
+				"name": "online_identifier",
+				"type": "String"
+			},
+			{
+				"name": "Original Title ISSN",
+				"type": "String"
+			},
+			{
+				"name": "date_first_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "num_first_vol_online",
+				"type": "String"
+			},
+			{
+				"name": "num_first_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "date_last_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "num_last_vol_online",
+				"type": "String"
+			},
+			{
+				"name": "num_last_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "title_url",
+				"type": "String"
+			},
+			{
+				"name": "first_author",
+				"type": "String"
+			},
+			{
+				"name": "title_id",
+				"type": "String"
+			},
+			{
+				"name": "embargo_info",
+				"type": "String"
+			},
+			{
+				"name": "coverage_depth",
+				"type": "String"
+			},
+			{
+				"name": "coverage_notes",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

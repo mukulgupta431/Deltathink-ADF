@@ -1,0 +1,21 @@
+{
+	"name": "ds_sage_openacess_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sagepub_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/17_SAGE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "sites/default/files/sage_choice_price_list_2025_-_external.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

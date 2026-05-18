@@ -1,0 +1,23 @@
+{
+	"name": "ds_thieme_all_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/Thieme"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "All.xlsx",
+				"folderPath": "bronze/Thieme/import",
+				"fileSystem": "apc"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

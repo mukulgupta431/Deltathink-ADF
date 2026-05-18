@@ -1,0 +1,47 @@
+{
+	"name": "ds_mit_press_gold_oa_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/Misc/20 MIT Press"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/MIT Press/goldOA",
+				"fileSystem": "apc"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"gold_open_access_journals": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"title": {
+								"type": "string"
+							},
+							"title_url": {
+								"type": "string"
+							},
+							"Online_ISSN": {
+								"type": "string"
+							},
+							"Print_ISSN": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

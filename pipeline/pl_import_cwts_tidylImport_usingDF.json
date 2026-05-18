@@ -1,0 +1,37 @@
+{
+	"name": "pl_import_cwts_tidylImport_usingDF",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_TypeCast_cwtsTidyTable",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-03-28T09:43:48Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

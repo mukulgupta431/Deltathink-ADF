@@ -1,0 +1,47 @@
+{
+	"name": "ds_BMJ_bronze_hybrid_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/27_BMJ"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/BMJ Group/hybrid",
+				"fileSystem": "apc"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"journal": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"title": {
+								"type": "string"
+							},
+							"title_url": {
+								"type": "string"
+							},
+							"APC": {
+								"type": "string"
+							},
+							"currency": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,23 @@
+{
+	"name": "ds_degruyter_journal",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/29_de Gruyter"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Journal_Price_List.xlsx",
+				"folderPath": "bronze/De Gruyter/import",
+				"fileSystem": "apc"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

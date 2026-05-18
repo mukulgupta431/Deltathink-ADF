@@ -1,0 +1,257 @@
+{
+	"name": "31_Karger_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_karger_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "oaJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_karger_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "hybridJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_karger_price",
+						"type": "DatasetReference"
+					},
+					"name": "kargerPrice"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_karger_all",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "onlyActive"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "onlyActiveHybrid"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "lookupPrice"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "unionHybridJournal"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as date,",
+				"          num_first_vol_online as short,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as date,",
+				"          num_last_vol_online as short,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as string,",
+				"          access_type as boolean,",
+				"          oclc_number as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> oaJournal",
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as date,",
+				"          num_first_vol_online as short,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as date,",
+				"          num_last_vol_online as short,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as string,",
+				"          access_type as string,",
+				"          oclc_number as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> hybridJournal",
+				"source(output(",
+				"          {3 Digit Code} as string,",
+				"          {Journal name} as string,",
+				"          {APC 2025 EUR Full article} as short,",
+				"          {APC 2025 EUR Short article} as short,",
+				"          {APC 2025 CHF Full article} as short,",
+				"          {APC 2025 CHF Short article} as short,",
+				"          {APC 2025 USD Full article} as short,",
+				"          {APC 2025 USD Short article} as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> kargerPrice",
+				"oaJournal filter(isNull(date_last_issue_online) || toString(date_last_issue_online) == '') ~> onlyActive",
+				"onlyActive derive(Publisher = :publisher_v,",
+				"          ISSN1 = online_identifier,",
+				"          ISSN2 = print_identifier,",
+				"          Title = publication_title,",
+				"          Source = :source_v,",
+				"          Model = \"Fully OA\",",
+				"          {Model Notes} = \"\",",
+				"          Currency = :currency_v,",
+				"          {License Types} = \"CC BY, CC BY-NC\",",
+				"          Year = \"2025\",",
+				"          PublisherID = replace(title_url, 'https://karger.com/', ''),",
+				"          publisher_v := \"Karger\",",
+				"          source_v := \"Publisher Website via Misc Publisher APCs list\",",
+				"          currency_v := \"USD\") ~> derivedColumn1",
+				"derivedColumn3 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"hybridJournal filter(isNull(date_last_issue_online) || toString(date_last_issue_online) == '') ~> onlyActiveHybrid",
+				"onlyActiveHybrid derive(Publisher = :publisher_v,",
+				"          ISSN1 = online_identifier,",
+				"          ISSN2 = print_identifier,",
+				"          Title = publication_title,",
+				"          Source = :source_v,",
+				"          Model = \"Hybrid\",",
+				"          {Model Notes} = \"\",",
+				"          APC = toString(3950)",
+				"",
+				"/*  logic & price used in 2024",
+				"toString(",
+				"iif(",
+				"    in(['Annals of Nutrition and Metabolism', 'Cardiology', 'Cytogenetic and Genome Research', 'Digestive Diseases', ",
+				"        'European Addiction Research', 'Gynecologic and Obstetric Investigation', 'Journal of Vascular Research',",
+				"        'Neurodegenerative Diseases', 'Neuropsychobiology', 'Sexual Development', 'Skin Appendage Disorders'], publication_title),3275,3850)",
+				")",
+				"",
+				"Annals of Nutrition and Metabolism",
+				"Cardiology",
+				"Cytogenetic and Genome Research",
+				"Digestive Diseases",
+				"European Addiction Research",
+				"Gynecologic and Obstetric Investigation",
+				"Journal of Vascular Research",
+				"Neurodegenerative Diseases",
+				"Neuropsychobiology",
+				"Sexual Development",
+				"Skin Appendage Disorders */,",
+				"          Currency = :currency_v,",
+				"          {License Types} = \"CC BY, CC BY-NC\",",
+				"          Year = \"2025\",",
+				"          PublisherID = replace(title_url, 'https://karger.com/', ''),",
+				"          JoiningID = replace(title_url, 'https://karger.com/', ''),",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          publisher_v := \"Karger\",",
+				"          source_v := \"Publisher Website via Misc Publisher APCs list\",",
+				"          currency_v := \"USD\") ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"derivedColumn1, kargerPrice lookup(PublisherID == {3 Digit Code},",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupPrice",
+				"lookupPrice derive(APC = iif(isNull({APC 2025 USD Full article}),'0',toString({APC 2025 USD Full article})),",
+				"          JoiningID = PublisherID,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null())) ~> derivedColumn3",
+				"select1, select2 union(byName: true)~> unionHybridJournal",
+				"unionHybridJournal sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

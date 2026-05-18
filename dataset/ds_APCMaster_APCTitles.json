@@ -1,0 +1,116 @@
+{
+	"name": "ds_APCMaster_APCTitles",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/03_Gold layer"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "general/APC_titles",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "APC_ID",
+				"type": "String"
+			},
+			{
+				"name": "ISSN_L",
+				"type": "String"
+			},
+			{
+				"name": "Title_ID",
+				"type": "String"
+			},
+			{
+				"name": "Source_title",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Publisher",
+				"type": "String"
+			},
+			{
+				"name": "Publisher_Short",
+				"type": "String"
+			},
+			{
+				"name": "Publisher_Short_OA",
+				"type": "String"
+			},
+			{
+				"name": "Year",
+				"type": "String"
+			},
+			{
+				"name": "Model",
+				"type": "String"
+			},
+			{
+				"name": "APC",
+				"type": "String"
+			},
+			{
+				"name": "Source_title_history",
+				"type": "String"
+			},
+			{
+				"name": "Title_history",
+				"type": "String"
+			},
+			{
+				"name": "Publisher_history",
+				"type": "String"
+			},
+			{
+				"name": "Publisher_history_OA",
+				"type": "String"
+			},
+			{
+				"name": "Year_history",
+				"type": "String"
+			},
+			{
+				"name": "ID_history",
+				"type": "String"
+			},
+			{
+				"name": "wUID",
+				"type": "String"
+			},
+			{
+				"name": "Contiguous",
+				"type": "String"
+			},
+			{
+				"name": "Updates",
+				"type": "String"
+			},
+			{
+				"name": "Child_records",
+				"type": "String"
+			},
+			{
+				"name": "Change_publisher",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

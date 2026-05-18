@@ -1,0 +1,117 @@
+{
+	"name": "ds_gold_APC_tidy_ISSN_Ls",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/03_Gold layer"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "MissingIssnl.csv",
+				"folderPath": "gold/APCImportMap_2025",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "wUID",
+				"type": "String"
+			},
+			{
+				"name": "ISSN1",
+				"type": "String"
+			},
+			{
+				"name": "ISSN2",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Source",
+				"type": "String"
+			},
+			{
+				"name": "Model",
+				"type": "String"
+			},
+			{
+				"name": "Model Notes",
+				"type": "String"
+			},
+			{
+				"name": "APC",
+				"type": "String"
+			},
+			{
+				"name": "Currency",
+				"type": "String"
+			},
+			{
+				"name": "Year",
+				"type": "String"
+			},
+			{
+				"name": "LicenseType",
+				"type": "String"
+			},
+			{
+				"name": "PublisherID",
+				"type": "String"
+			},
+			{
+				"name": "JoiningID",
+				"type": "String"
+			},
+			{
+				"name": "Imprint",
+				"type": "String"
+			},
+			{
+				"name": "Society",
+				"type": "String"
+			},
+			{
+				"name": "TJ",
+				"type": "String"
+			},
+			{
+				"name": "Audit",
+				"type": "String"
+			},
+			{
+				"name": "Old_Table",
+				"type": "String"
+			},
+			{
+				"name": "Old_wUID",
+				"type": "String"
+			},
+			{
+				"name": "Old_Year",
+				"type": "String"
+			},
+			{
+				"name": "DAO",
+				"type": "String"
+			},
+			{
+				"name": "Publisher",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

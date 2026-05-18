@@ -1,0 +1,26 @@
+{
+	"name": "ds_emerald_kbart_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_emerald_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/16_Emerald"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/sites/default/files/assets/EmeraldPublishing_Global_AllJournals_2024-10-20.txt"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

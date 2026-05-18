@@ -1,0 +1,132 @@
+{
+	"name": "30_copernicus_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_copernicus_apc",
+						"type": "DatasetReference"
+					},
+					"name": "apc"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_copernicus_issn_mapping",
+						"type": "DatasetReference"
+					},
+					"name": "issn"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_scopernicus_society_mapping",
+						"type": "DatasetReference"
+					},
+					"name": "society"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_copernicus_all",
+						"type": "DatasetReference"
+					},
+					"name": "siver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "getissn"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Journals as string,",
+				"          journal_url as string,",
+				"          APCs as integer,",
+				"          {Additional information} as string,",
+				"          PAGES as integer,",
+				"          journal_code as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> apc",
+				"source(output(",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          {Publisher ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> issn",
+				"source(output(",
+				"          ID as string,",
+				"          Society as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> society",
+				"apc, issn join(journal_code == {Publisher ID},",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> getissn",
+				"getissn, society join(journal_code == ID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(Publisher = \"Copernicus Publications\",",
+				"          Source = \"Publisher Website via Misc Publisher APCs list\",",
+				"          Model = \"Fully OA\",",
+				"          Currency = \"EUR\",",
+				"          {License Types} = \"CC BY\",",
+				"          Year = \"2025\",",
+				"          APC = APCs * PAGES,",
+				"          {Model Notes} = {Additional information},",
+				"          Imprint = toString(null()),",
+				"          JoiningID = journal_code) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = Journals,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID = journal_code,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> siver"
+			]
+		}
+	}
+}

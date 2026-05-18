@@ -1,0 +1,23 @@
+{
+	"name": "ds_sage_goldoa_pricelist",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/17_SAGE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "gold_oa_price_list.xlsx",
+				"folderPath": "bronze/SAGE/import",
+				"fileSystem": "apc"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

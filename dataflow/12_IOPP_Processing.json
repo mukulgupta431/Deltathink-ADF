@@ -1,0 +1,98 @@
+{
+	"name": "12_IOPP_Processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_iopp_apc",
+						"type": "DatasetReference"
+					},
+					"name": "apc"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_iopp_all",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Journal as string,",
+				"          {ISSN Online} as string,",
+				"          APC_GBP as string,",
+				"          APC_EUR as string,",
+				"          APC_USD as string,",
+				"          {Type of open access} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> apc",
+				"apc derive(Publisher = \"Institute of Physics Publishing (IoPP)\",",
+				"          ISSN1 = \"\",",
+				"          ISSN2 = {ISSN Online},",
+				"          Title = Journal,",
+				"          Source = \"Publisher Website via Misc Publisher APCs list\",",
+				"          Model = :model_v,",
+				"          {Model Notes} = \"\",",
+				"          APC = :apc_v,",
+				"          Currency = iif(isNull(:apc_v),'',\"USD\"),",
+				"          {License Types} = \"CC BY\",",
+				"          Year = \"2025\",",
+				"          PublisherID = {ISSN Online},",
+				"          JoiningID = \"\",",
+				"          {Publisher URL} = \"\",",
+				"          Imprint = \"\",",
+				"          Society = Journal,",
+				"          model_v := iif({Type of open access} == 'Fully open', 'Fully OA', iif({Type of open access} == 'Hybrid', 'Hybrid', iif({Type of open access} == 'Conf series', 'Fully OA', 'None'))),",
+				"          apc_v := iif(",
+				"    isNull(APC_USD), ",
+				"    iif(:model_v == 'None',APC_USD,'0'),",
+				"    iif(trim(APC_USD) == 'No charge' || trim(APC_USD) == '-','0',APC_USD)   ",
+				"    )) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> silver"
+			]
+		}
+	}
+}

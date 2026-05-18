@@ -1,0 +1,41 @@
+{
+	"name": "ds_ms_doi_tidy_topics",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing/OpenAlex"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed_v1/doi_tidy_topics",
+				"fileSystem": "openalex"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "DOI_tidy_ID",
+				"type": "INT64"
+			},
+			{
+				"name": "topic_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "score",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "n",
+				"type": "INT64"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

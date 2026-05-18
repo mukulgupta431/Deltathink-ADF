@@ -1,0 +1,49 @@
+{
+	"name": "33_pl_populate_acm_silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "ACM_Silver_Composer",
+				"type": "SynapseNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebook": {
+						"referenceName": {
+							"value": "ACM_Association for Computing Machinery_Composer",
+							"type": "Expression"
+						},
+						"type": "NotebookReference"
+					},
+					"snapshot": true,
+					"sparkPool": {
+						"referenceName": {
+							"value": "oadatSparkPook",
+							"type": "Expression"
+						},
+						"type": "BigDataPoolReference"
+					},
+					"executorSize": "Small",
+					"driverSize": "Small"
+				},
+				"linkedServiceName": {
+					"referenceName": "dl_oadat_AzureSynapseArtifacts",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/apc/bronze to silver"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-01-28T00:10:27Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

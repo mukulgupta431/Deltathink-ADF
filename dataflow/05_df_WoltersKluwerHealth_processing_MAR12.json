@@ -1,0 +1,310 @@
+{
+	"name": "05_df_WoltersKluwerHealth_processing_MAR12",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "sourceKbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceHybrid"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOaJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_ReplaceTitles",
+						"type": "DatasetReference"
+					},
+					"name": "sourceRevisedTitle"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_TEST",
+						"type": "DatasetReference"
+					},
+					"name": "sinkTEST"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_TEST",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_TEST",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupHybFOA"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "select6"
+				},
+				{
+					"name": "select7"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup3"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "select8"
+				},
+				{
+					"name": "select9"
+				},
+				{
+					"name": "derivedColumn6"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as integer,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as integer,",
+				"          access_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceKbart",
+				"source(output(",
+				"          Specialty as string,",
+				"          {Journal title} as string,",
+				"          {APC (CCBY-NC-ND)} as string,",
+				"          {APC (CCBY)} as string,",
+				"          print_issn as string,",
+				"          electronic_issn as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceHybrid",
+				"source(output(",
+				"          {Journal Name} as string,",
+				"          {Journal URL} as string,",
+				"          {Impact Factor} as double,",
+				"          {Original Research} as string,",
+				"          {Case Reports/Study Protocols} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOaJournal",
+				"source(output(",
+				"          Find as string,",
+				"          Replace as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceRevisedTitle",
+				"derivedColumn4, select8 lookup(publication_title == {Journal title},",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupHybFOA",
+				"lookupHybFOA select(mapColumn(",
+				"          publication_title_KBART = publication_title,",
+				"          print_identifier,",
+				"          online_identifier,",
+				"          title_url,",
+				"          first_author,",
+				"          title_id,",
+				"          publisher_name,",
+				"          publication_type,",
+				"          Specialty,",
+				"          {Journal title_HYB} = {Journal title},",
+				"          {APC (CCBY-NC-ND)},",
+				"          {APC (CCBY)},",
+				"          print_issn,",
+				"          electronic_issn",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"select8, derivedColumn4 join({Journal title} == publication_title,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"select9, derivedColumn4 lookup({Journal Name} == publication_title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"join1 select(mapColumn(",
+				"          {Journal title_hyb} = {Journal title},",
+				"          publication_title_kbart = publication_title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select6",
+				"lookup1 select(mapColumn(",
+				"          {Journal Name_OA} = {Journal Name},",
+				"          publication_title_Kbart = publication_title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select7",
+				"sourceHybrid, sourceRevisedTitle lookup({Journal title} == Find,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2 derive({Journal title} = iif(not(isNull(Find)),trim(Replace),    iif(({Journal title} == 'SHOCK%'),'Shock',trim({Journal title}))    )/* Discrepancies observed in few Titles between Hyb & OA journals names and Kbart Titles. Hence hardcoding using to Find and Replace csv file */) ~> derivedColumn1",
+				"sourceOaJournal, sourceRevisedTitle lookup({Journal Name} == Find,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup3",
+				"lookup3 derive({Journal Name} = iif(not(isNull(Find)),trim(Replace),    iif(({Journal Name} == 'SHOCK%'),'Shock',trim({Journal Name}))    )/* Discrepancies observed in few Titles between Hyb & OA journals names and Kbart Titles. Hence hardcoding using to Find and Replace csv file */) ~> derivedColumn2",
+				"derivedColumn1 derive({Journal title} = lower(\r",
+				"  regexReplace(\r",
+				"    regexReplace(\r",
+				"      regexReplace(\r",
+				"        regexReplace({Journal title}, '&', 'and'),\r",
+				"        '[^a-zA-Z0-9]', ' '\r",
+				"      ),\r",
+				"      '\\\\s+', ' '\r",
+				"    ),\r",
+				"    '®', ''\r",
+				"  )\r",
+				")) ~> derivedColumn3",
+				"derivedColumn5 derive(publication_title = lower(\r",
+				"  regexReplace(\r",
+				"    regexReplace(\r",
+				"      regexReplace(\r",
+				"        regexReplace(publication_title, '&', 'and'),\r",
+				"        '[^a-zA-Z0-9]', ' '\r",
+				"      ),\r",
+				"      '\\\\s+', ' '\r",
+				"    ),\r",
+				"    '®', ''\r",
+				"  )\r",
+				")) ~> derivedColumn4",
+				"sourceKbart, sourceRevisedTitle lookup(publication_title == Find,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"lookup4 derive(publication_title = iif(not(isNull(Find)),trim(Replace),    iif(({publication_title} == 'SHOCK%'),'Shock',trim({publication_title}))    )/* Discrepancies observed in few Titles between Hyb & OA journals names and Kbart Titles. Hence hardcoding using to Find and Replace csv file */) ~> derivedColumn5",
+				"derivedColumn3 select(mapColumn(",
+				"          Specialty,",
+				"          {Journal title},",
+				"          {APC (CCBY-NC-ND)},",
+				"          {APC (CCBY)},",
+				"          print_issn,",
+				"          electronic_issn,",
+				"          Find,",
+				"          Replace",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select8",
+				"derivedColumn6 select(mapColumn(",
+				"          {Journal Name},",
+				"          {Journal URL},",
+				"          {Impact Factor},",
+				"          {Original Research},",
+				"          {Case Reports/Study Protocols},",
+				"          Find,",
+				"          Replace",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select9",
+				"derivedColumn2 derive({Journal Name} = lower(  regexReplace(    regexReplace(      regexReplace(        regexReplace({Journal Name}, '&', 'and'),        '[^a-zA-Z0-9]', ' '      ),      '\\\\s+', ' '    ),    '®', ''  ))) ~> derivedColumn6",
+				"select5 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WKKbartFoundInHybrid.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkTEST",
+				"select6 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WKHybFoundInkbart.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1",
+				"select7 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WKOAFoundInKbart.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink2"
+			]
+		}
+	}
+}

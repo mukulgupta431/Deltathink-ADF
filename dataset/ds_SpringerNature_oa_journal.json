@@ -1,0 +1,23 @@
+{
+	"name": "ds_SpringerNature_oa_journal",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/01_SpringerNature"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "oa_pdf",
+				"folderPath": "bronze/springerNature/import",
+				"fileSystem": "apc"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

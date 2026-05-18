@@ -1,0 +1,1243 @@
+{
+	"name": "pl_import_MySQLTable_unpaywall_totals",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load Unpaywall Totals",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Genre",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Genre",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Unpaywall_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unpaywall_ID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source_records",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_records",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_OA_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_OA_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Major_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Major_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Major_Publisher_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Major_Publisher_OA",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Major",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Major",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Predatory",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Predatory",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "DOIs_Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DOIs_Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DOIs_Publisher_check",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DOIs_Publisher_check",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Year",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "YTD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "YTD",
+									"type": "UInt32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Publication_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publication_Data_Year",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Metrics_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Metrics_Data_Year",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Articles",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Articles",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "Green",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Green",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Gold",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Gold",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Hybrid",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Hybrid",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Not_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Not_OA",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Bronze",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Bronze",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Closed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Closed",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Other",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Other",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Null",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Null",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "APC_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "APC_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Title_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "inIndex",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "inIndex",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "inMarket",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "inMarket",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "In_Sample",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "In_Sample",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Journals_Subjects",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Journals_Subjects",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Society",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Society",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "Society_Type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Society_Type",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Count_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Count_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "List_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "List_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Known_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Known_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Guess_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Guess_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Model_Evidence",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Model_Evidence",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Adjust_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Adjust_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Adjust_Evidence",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Adjust_Evidence",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "last_year_model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "last_year_model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "next_year_model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "next_year_model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Most_Recent_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Most_Recent_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Flipped_Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Flipped_Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "last_year_known_model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "last_year_known_model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "B",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "B",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "C",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "C",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "G",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "G",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "Grn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Grn",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "H",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "H",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "N",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "N",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "O",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "O",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "guess",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "guess",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "guessV1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "guessV1",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "model_weight",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "model_weight",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Greenv1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Greenv1",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Goldv1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Goldv1",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Hybridv1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Hybridv1",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Not_OAv1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Not_OAv1",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Articlesv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Articlesv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Greenv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Greenv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Goldv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Goldv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Hybridv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Hybridv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Not_OAv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Not_OAv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Bronzev2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Bronzev2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Closedv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Closedv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Permissivev2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Permissivev2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Restrictedv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Restrictedv2",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "inPriceList",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "inPriceList",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "inDOAJ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "inDOAJ",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "inROAD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "inROAD",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Permissive",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Permissive",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Restricted",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Restricted",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "P_to_R",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "P_to_R",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "P_to_Rv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "P_to_Rv2",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "Corr_All",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Corr_All",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "Corr_Fully_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Corr_Fully_OA",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "Corr_Hybrid",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Corr_Hybrid",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "Corr_Closed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Corr_Closed",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "G_P",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "G_P",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "G_R",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "G_R",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "G_Pv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "G_Pv2",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "G_Rv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "G_Rv2",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "H_P",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "H_P",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "H_R",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "H_R",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "H_Pv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "H_Pv2",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "H_Rv2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "H_Rv2",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "is_oa_true",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "is_oa_true",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "is_oa_false",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "is_oa_false",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "submitted",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "submitted",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "accepted",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "accepted",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "published",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "published",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "nullVersion",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "nullVersion",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_unpaywall_totals",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywall_totals",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/01_MSOpenAlex_DOI_Tidys_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-18T13:15:34Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

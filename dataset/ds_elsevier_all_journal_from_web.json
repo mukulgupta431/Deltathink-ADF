@@ -1,0 +1,21 @@
+{
+	"name": "ds_elsevier_all_journal_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_elsevier_legacyfileshare_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/01_Elsevier"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/promis_misc/sd-content/journals/jnlactive.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

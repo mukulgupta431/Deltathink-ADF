@@ -1,0 +1,26 @@
+{
+	"name": "ds_ieee_kbart_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_IEEE_org_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/20_IEEE"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/otherfiles/IEEEXplore_Global_All-Journals.txt"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

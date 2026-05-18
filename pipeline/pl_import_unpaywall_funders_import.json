@@ -1,0 +1,295 @@
+{
+	"name": "pl_import_unpaywall_funders_import",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load unpaywall_funders_import",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "funders_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "funders_id",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "openalex_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "openalex_id",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "ror_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ror_id",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "crossref_id",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "crossref_id",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "other_ids_json",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "other_ids_json",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "roles",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "roles",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "country_code",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "country_code",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "grants_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "grants_count",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "display_name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "display_name",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "name_as_stated",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "name_as_stated",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "alternate_titles",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "alternate_titles",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "works_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "works_count",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "cited_by_count",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "cited_by_count",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "if2y",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "if2y",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "h_index",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "h_index",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "i10_index",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "i10_index",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "counts_by_year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "counts_by_year",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "updated_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "updated_date",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "created_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "created_date",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_openAlex_funder_import",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlunpaywall_funders_import",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/13_MS_Consulting"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-24T08:53:46Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

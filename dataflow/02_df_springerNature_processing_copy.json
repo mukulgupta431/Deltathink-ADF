@@ -1,0 +1,249 @@
+{
+	"name": "02_df_springerNature_processing_copy",
+	"properties": {
+		"folder": {
+			"name": "apc/abkup"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_springerNature_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournals"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_springerNature_bronze_hybrid",
+						"type": "DatasetReference"
+					},
+					"name": "sourceHybrid"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_springerNature_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOA"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_springerNature_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAllSilver"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_springerNature_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkHybOA"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "join1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Title as string,",
+				"          Format as string,",
+				"          {Publishing Model} as string,",
+				"          {Hybrid Type} as string,",
+				"          {Product ID} as integer,",
+				"          {ISSN print} as string,",
+				"          {ISSN electronic} as string,",
+				"          Imprint as string,",
+				"          {Primary Language} as string,",
+				"          {Vols Qty} as short,",
+				"          {Scheduled Vol Nos} as string,",
+				"          {Single Issues per volume} as short,",
+				"          clean_title as string,",
+				"          issnl as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournals",
+				"source(output(",
+				"          {Journal title} as string,",
+				"          eISSN as string,",
+				"          Imprint as string,",
+				"          EUR as string,",
+				"          USD as string,",
+				"          GBP as string,",
+				"          clean_title as string,",
+				"          issnl as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceHybrid",
+				"source(output(",
+				"          {Journal title} as string,",
+				"          eISSN as string,",
+				"          Imprint as string,",
+				"          EUR as string,",
+				"          USD as string,",
+				"          GBP as string,",
+				"          clean_title as string,",
+				"          issnl as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOA",
+				"sourceAllJournals derive(Publisher = 'Springer Nature',",
+				"          ISSN1 = {ISSN print},",
+				"          ISSN2 = {ISSN electronic},",
+				"          Title = trim(replace(replace(Title,'*',''),'&','and')),",
+				"          Source = 'Publisher Price List',",
+				"          Model = toString(null()),",
+				"          {Model Notes} = {Hybrid Type},",
+				"          APC = toString(null()),",
+				"          Currency = toString(null()),",
+				"          Year = '2024',",
+				"          JoiningID = issnl,",
+				"          PublisherID = toString(null()),",
+				"          Society = toString(null())) ~> derivedColumn1",
+				"sourceHybrid derive(Publisher = 'Springer Nature',",
+				"          ISSN1 = toString(null()),",
+				"          ISSN2 = eISSN,",
+				"          Title = trim(replace(replace({Journal title},'*',''),'&','and')),",
+				"          Source = 'Publisher Price List',",
+				"          Model = 'Hybrid',",
+				"          {Model Notes} = toString(null()),",
+				"          APC = USD,",
+				"          Currency = 'USD',",
+				"          Year = '2024',",
+				"          PublisherID = toString(null()),",
+				"          JoiningID = issnl,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null())) ~> derivedColumn2",
+				"sourceOA derive(Publisher = 'Springer Nature',",
+				"          ISSN1 = toString(null()),",
+				"          ISSN2 = eISSN,",
+				"          Title = trim(replace(replace({Journal title},'*',''),'&','and')),",
+				"          Source = 'Publisher Price List',",
+				"          Model = 'Fully OA',",
+				"          {Model Notes} = toString(null()),",
+				"          APC = replace(USD,'US$',''),",
+				"          Currency = 'USD',",
+				"          Year = '2024',",
+				"          PublisherID = toString(null()),",
+				"          JoiningID = issnl,",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null())) ~> derivedColumn3",
+				"select2, select3 union(byName: true)~> union1",
+				"derivedColumn3 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"join1 derive(Model = coalesce(union1@Model,derivedColumn1@Model),",
+				"          APC = coalesce(union1@APC,derivedColumn1@APC),",
+				"          Currency = coalesce(union1@Currency,derivedColumn1@Currency)) ~> derivedColumn4",
+				"derivedColumn4 select(mapColumn(",
+				"          Publisher = derivedColumn1@Publisher,",
+				"          ISSN1 = derivedColumn1@ISSN1,",
+				"          ISSN2 = derivedColumn1@ISSN2,",
+				"          Title = derivedColumn1@Title,",
+				"          Source = derivedColumn1@Source,",
+				"          Model,",
+				"          {Model Notes} = derivedColumn1@{Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          Year = derivedColumn1@Year,",
+				"          JoiningID = derivedColumn1@JoiningID,",
+				"          PublisherID = derivedColumn1@PublisherID,",
+				"          Imprint = sourceAllJournals@Imprint,",
+				"          Society = derivedColumn1@Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"union1 derive(PublisherID = toString(null()),",
+				"          Society = toString(null())) ~> derivedColumn5",
+				"derivedColumn1, union1 join(derivedColumn1@JoiningID == union1@JoiningID,",
+				"     joinType:'outer',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"select4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAllSilver",
+				"derivedColumn5 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkHybOA"
+			]
+		}
+	}
+}

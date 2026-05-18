@@ -1,0 +1,196 @@
+{
+	"name": "df_APCImportMapMissingIssnL_sourceTitle_Master_Crosswalk",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCImportMap"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Master_Crosswalk",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMasterCrosswalk"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCTidyISSNLs"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "selectSourceTitle"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedMissingTable"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "APCTidyISSNLs"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "derivedViaSourceTitle"
+				},
+				{
+					"name": "selectMissingTable"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          wUID as long,",
+				"          ISSN as string,",
+				"          ISSN_L as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Publisher as string,",
+				"          PublisherID as string,",
+				"          ISSN_L_via as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          Idx as short,",
+				"          Title_ID as integer,",
+				"          ISSN_L as string,",
+				"          Is_Indexed as boolean,",
+				"          Is_Market as boolean,",
+				"          Source as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Unpaywall_ID as short,",
+				"          UP_Title as string,",
+				"          UP_Source_title as string,",
+				"          UP_No_Data as boolean,",
+				"          UP_Sources_Types as string,",
+				"          Nordic_ID as integer,",
+				"          Nordic_Title as string,",
+				"          ERA_ID as integer,",
+				"          ERA_Title as string,",
+				"          SM_ID as long,",
+				"          DOAJ_ID as string,",
+				"          CWTS_ID as string,",
+				"          CWTS_Title as string,",
+				"          CWTS_Source_Title as string,",
+				"          APC_ID as short,",
+				"          APC_Title as string,",
+				"          APC_Source_title as string,",
+				"          Journals_Subjects as short,",
+				"          DTJT_Codes as string,",
+				"          Subject_Priority as short,",
+				"          Title_ID_OLD as integer,",
+				"          CBN_ID as integer,",
+				"          ASJCs as string,",
+				"          CS_ID as long,",
+				"          APC_ID_2022 as integer,",
+				"          Record_Created as timestamp,",
+				"          Has_Source_IDs as string,",
+				"          Use_Record as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceMasterCrosswalk",
+				"source1 filter(isNull(ISSN_L)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          Source_title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectSourceTitle",
+				"sourceMasterCrosswalk, selectSourceTitle lookup(sourceMasterCrosswalk@Source_title == selectSourceTitle@Source_title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 derive(Source_title = sourceMasterCrosswalk@Source_title,",
+				"          ISSN_L = iif(not(isNull(ISSN_L)),ISSN_L,toString(null()))) ~> derivedMissingTable",
+				"derivedMissingTable filter(not(isNull(ISSN_L))) ~> filter2",
+				"source1 select(mapColumn(",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> APCTidyISSNLs",
+				"APCTidyISSNLs, selectMissingTable lookup(APCTidyISSNLs@Source_title == selectMissingTable@Source_title,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"lookup2 derive(ISSN_L = :missing_ISSN_L_V,",
+				"          ISSN_L_via = iif(not(isNull(:missing_ISSN_L_V)) && isNull(:APCTidyISSNl_V),\"Source_title, Master Crosswalk\",ISSN_L_via)\r",
+				"\r",
+				"/*iif(not(isNull(:missing_ISSN_L_V)) && isNull(source1@ISSN_L_via),'Source_title only',toString(null()))*/,",
+				"          missing_ISSN_L_V := iif(isNull(APCTidyISSNLs@ISSN_L),selectMissingTable@ISSN_L,APCTidyISSNLs@ISSN_L),",
+				"          APCTidyISSNl_V := APCTidyISSNLs@ISSN_L) ~> derivedViaSourceTitle",
+				"filter2 select(mapColumn(",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectMissingTable",
+				"derivedViaSourceTitle sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          wUID as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          {Model Notes} as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as string,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Old_Table as string,",
+				"          Old_wUID as string,",
+				"          Old_Year as string,",
+				"          DAO as string,",
+				"          Publisher as string",
+				"     ),",
+				"     partitionFileNames:['MissingIssnl.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkAPCTidyISSNLs"
+			]
+		}
+	}
+}

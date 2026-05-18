@@ -1,0 +1,112 @@
+{
+	"name": "ds_wiley_bronze_freeoa_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/04_wiley"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/wiley/freeoa",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Journal Group code",
+				"type": "String"
+			},
+			{
+				"name": "Print ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Print Journal Code",
+				"type": "String"
+			},
+			{
+				"name": "Digital ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Digital Journal Code",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Print Material Number",
+				"type": "String"
+			},
+			{
+				"name": "Print Status",
+				"type": "String"
+			},
+			{
+				"name": "Digital Material Number",
+				"type": "String"
+			},
+			{
+				"name": "Digital Status",
+				"type": "String"
+			},
+			{
+				"name": "MultiMedia SAP Material",
+				"type": "String"
+			},
+			{
+				"name": "FTE Price Model",
+				"type": "String"
+			},
+			{
+				"name": "DOI",
+				"type": "String"
+			},
+			{
+				"name": "URL",
+				"type": "String"
+			},
+			{
+				"name": "Renewal Subscription Type",
+				"type": "String"
+			},
+			{
+				"name": "Journal Owned by",
+				"type": "String"
+			},
+			{
+				"name": "General Subject Category",
+				"type": "String"
+			},
+			{
+				"name": "Primary Subject Area",
+				"type": "String"
+			},
+			{
+				"name": "Impact Factor 2022",
+				"type": "String"
+			},
+			{
+				"name": "clean_title",
+				"type": "String"
+			},
+			{
+				"name": "issnl",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

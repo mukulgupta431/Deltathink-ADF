@@ -1,0 +1,21 @@
+{
+	"name": "ds_sage_goldoa_pricelist_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sagepub_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/17_SAGE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "sites/default/files/sage_gold_oa_apcs_2025_0.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,123 @@
+{
+	"name": "29_df_deGruyter_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_deGruyter_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournal"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_deGruyter_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PreparingList1"
+				},
+				{
+					"name": "selectRequiredColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Journal Code Klopotek} as string,",
+				"          {Journal Code Online} as string,",
+				"          {Print-ISSN} as string,",
+				"          {Online-ISSN} as string,",
+				"          Title as string,",
+				"          {Product Type} as string,",
+				"          {First PubDate} as date,",
+				"          {Volume Number} as string,",
+				"          {Issues per Year} as short,",
+				"          {Institutional Print Only USD} as short,",
+				"          {Institutional Online Only USD} as double,",
+				"          {Institutional Print+Online USD} as short,",
+				"          {Individual Print Only USD} as short,",
+				"          {Individual Online Only USD} as short,",
+				"          {Individual Print+Online USD} as short,",
+				"          {Price per Issue Print USD} as short,",
+				"          {Postage and Handling Outside Germany USD} as double,",
+				"          {Subject Area} as string,",
+				"          Publisher as string,",
+				"          {Main Language} as string,",
+				"          {Impact Factor} as string,",
+				"          {Creative Commons License} as string,",
+				"          {Publishing Model} as string,",
+				"          {APC EUR} as string,",
+				"          {Delayed Print Version} as boolean,",
+				"          {CJP Accessory} as boolean,",
+				"          Comment as string,",
+				"          URL as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournal",
+				"sourceAllJournal derive(Publisher = 'De Gruyter',",
+				"          ISSN1 = trim({Online-ISSN}),",
+				"          ISSN2 = trim({Print-ISSN}),",
+				"          Title = trim(Title),",
+				"          Source = 'Publisher Price List',",
+				"          Model = iif(",
+				"    in(['APC','Spo','S2O','OA '],:publishingModel_v),'Fully OA',",
+				"    iif(:publishingModel_v == 'Hyb','Hybrid',",
+				"    'None')",
+				"    )",
+				"/* =_xlfn.SWITCH(LEFT(TRIM([@[Publishing Model]]),4),\"(Gol\",\"Fully OA\",\"Spon\",\"Fully OA\",\"S2O\",\"Fully OA\",\"Subs\",\"Fuly OA\",\"Hybr\",\"Hybrid\",\"S2O\",\"Hybrid\",\"None\")",
+				"   discarded \"S2O\",\"Hybrid\" as this is already covered in \"Fully OA\" */,",
+				"          {Model Notes} = iif(:publishingModel_v == 'Hybr' || :publishingModel_v == 'No O', '',{Publishing Model}),",
+				"          APC = {APC EUR}",
+				"/* dowloaded journal details for USD(unlike EURO in the input excel sheet) */,",
+				"          Currency = iif(not(isNull({APC EUR})),'EUR',''),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = trim({Journal Code Klopotek}),",
+				"          JoiningID = trim({Journal Code Klopotek}),",
+				"          Imprint = Publisher,",
+				"          Society = iif({Publishing Model} == 'Partner Title','Society',''),",
+				"          year_v := '2025',",
+				"          publisher_v := 'De Gruyter',",
+				"          publishingModel_v := left(trim({Publishing Model}),3)) ~> PreparingList1",
+				"PreparingList1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal"
+			]
+		}
+	}
+}

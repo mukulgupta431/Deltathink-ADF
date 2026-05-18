@@ -1,0 +1,117 @@
+{
+	"name": "df_apa_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_apa_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "Kbart"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_apa_silver",
+						"type": "DatasetReference"
+					},
+					"name": "apaSilver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedimportColumns"
+				},
+				{
+					"name": "selectColummns"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "takeActiveOne"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          coverage_notes as string,",
+				"          publisher_name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Kbart",
+				"takeActiveOne derive(Publisher = :publisher_v,",
+				"          ISSN1 = print_identifier,",
+				"          ISSN2 = online_identifier,",
+				"          Title = publication_title,",
+				"          Source = :source_v,",
+				"          Model = :modle_v,",
+				"          {Model Notes} = :model_notes_v,",
+				"          APC = :apc_v,",
+				"          Currency = :currency_v,",
+				"          {License Types} = :license_types_v,",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = publisher_name,",
+				"          publisher_v := \"American Psychological Association (APA)\",",
+				"          source_v := \"Publisher Website via Misc Publisher APCs list\",",
+				"          modle_v := \"Hybrid\",",
+				"          model_notes_v := \"Wellcome & UKRI authors only. $3k APC for APA ©\",",
+				"          apc_v := \"3000\",",
+				"          currency_v := \"USD\",",
+				"          license_types_v := \"CC BY, CC BY-NC-ND\",",
+				"          year_v := \"2025\") ~> derivedimportColumns",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColummns",
+				"derivedimportColumns derive(Society = iif((print_identifier == '0008-400X' || print_identifier == '1196-1961' || print_identifier == '0708-5591'), 'Canadian Psychological Association', ",
+				"iif (print_identifier == toString('0586-7614'), 'National Institute of Health', 'American Psychological Association (APA)'))) ~> derivedColumn1",
+				"Kbart filter(isNull(date_last_issue_online)) ~> takeActiveOne",
+				"selectColummns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> apaSilver"
+			]
+		}
+	}
+}

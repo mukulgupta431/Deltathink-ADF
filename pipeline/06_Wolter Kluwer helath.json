@@ -1,0 +1,37 @@
+{
+	"name": "06_Wolter Kluwer helath",
+	"properties": {
+		"activities": [
+			{
+				"name": "silver processor",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "05_df_WoltersKluwerHealth_processing",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/Silver_Publisher_Pipelines/Major"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-01-15T07:41:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

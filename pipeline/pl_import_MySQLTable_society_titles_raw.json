@@ -1,0 +1,259 @@
+{
+	"name": "pl_import_MySQLTable_society_titles_raw",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Society Title Raw",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Idx",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Idx",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN1",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN2",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Product_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Product_ID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Society",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Society",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Alt_Title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Alt_Title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Title_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title_ID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "APC_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "APC_ID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Unpaywall_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unpaywall_ID",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Weight",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Weight",
+									"type": "SByte",
+									"physicalType": "tinyint"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "char"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Society",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Society",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_Society_Title_Raw",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySQLSocietyTitleRaw",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/04_MSOpenAlex_Unpaywall_Crosswalk_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-10T07:17:47Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

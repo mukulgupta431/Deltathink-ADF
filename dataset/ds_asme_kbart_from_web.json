@@ -1,0 +1,21 @@
+{
+	"name": "ds_asme_kbart_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asme_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/34_ASME"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/DocumentLibrary/ASME_Journals_KBART.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

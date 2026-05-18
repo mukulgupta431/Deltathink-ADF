@@ -1,0 +1,25 @@
+{
+	"name": "ds_ms_CrossRef_http",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MS_CrossRef",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

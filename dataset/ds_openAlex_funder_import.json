@@ -1,0 +1,105 @@
+{
+	"name": "ds_openAlex_funder_import",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "openAlex"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-578adb88-c15b-44f2-bb9d-a6b569227101-c000.csv",
+				"folderPath": "processed_v1/funders_csv",
+				"fileSystem": "openalex"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "funders_id",
+				"type": "String"
+			},
+			{
+				"name": "openalex_id",
+				"type": "String"
+			},
+			{
+				"name": "ror_id",
+				"type": "String"
+			},
+			{
+				"name": "crossref_id",
+				"type": "String"
+			},
+			{
+				"name": "other_ids_json",
+				"type": "String"
+			},
+			{
+				"name": "roles",
+				"type": "String"
+			},
+			{
+				"name": "country_code",
+				"type": "String"
+			},
+			{
+				"name": "grants_count",
+				"type": "String"
+			},
+			{
+				"name": "display_name",
+				"type": "String"
+			},
+			{
+				"name": "name_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "alternate_titles",
+				"type": "String"
+			},
+			{
+				"name": "works_count",
+				"type": "String"
+			},
+			{
+				"name": "cited_by_count",
+				"type": "String"
+			},
+			{
+				"name": "if2y",
+				"type": "String"
+			},
+			{
+				"name": "h_index",
+				"type": "String"
+			},
+			{
+				"name": "i10_index",
+				"type": "String"
+			},
+			{
+				"name": "counts_by_year",
+				"type": "String"
+			},
+			{
+				"name": "updated_date",
+				"type": "String"
+			},
+			{
+				"name": "created_date",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

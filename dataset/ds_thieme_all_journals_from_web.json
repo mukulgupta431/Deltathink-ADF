@@ -1,0 +1,21 @@
+{
+	"name": "ds_thieme_all_journals_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_thieme_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/Thieme"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/9ca5761af4a1cf7bf49dd51537e8f4d1/808a140c43f05a0b/133ede67be09/Jan07_APC-list-price-for-2025.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

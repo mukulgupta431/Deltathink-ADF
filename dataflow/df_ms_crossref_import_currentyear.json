@@ -1,0 +1,82 @@
+{
+	"name": "df_ms_crossref_import_currentyear",
+	"properties": {
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ms_crossrefImport_currentyear",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_ms_crossref_import_currentYear_processed",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          JournalTitle as string,",
+				"          JournalID as string,",
+				"          Publisher as string,",
+				"          pissn as string,",
+				"          eissn as string,",
+				"          additionalIssns as string,",
+				"          doi as string,",
+				"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"filter1 select(mapColumn(",
+				"          JournalTitle,",
+				"          JournalID,",
+				"          Publisher,",
+				"          pissn,",
+				"          eissn,",
+				"          additionalIssns,",
+				"          doi,",
+				"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"source1 filter(length(pissn) < 10 && isInteger(JournalID)) ~> filter1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          JournalTitle as string,",
+				"          JournalID as string,",
+				"          Publisher as string,",
+				"          pissn as string,",
+				"          eissn as string,",
+				"          additionalIssns as string,",
+				"          doi as string,",
+				"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

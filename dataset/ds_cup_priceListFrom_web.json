@@ -1,0 +1,21 @@
+{
+	"name": "ds_cup_priceListFrom_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_cup_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/25_CUP"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/ulsp6w1o06p0/51k77qoowiCnbljdLuqw2j/c8237f1a4fff23bfeebc843422ad7c2e/CUPA_APC_Price_List_2025_January.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

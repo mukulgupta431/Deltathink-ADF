@@ -1,0 +1,52 @@
+{
+	"name": "ds_elsevier_bronze_all_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/01_elsevier"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/elsevier/all",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Full Title",
+				"type": "String"
+			},
+			{
+				"name": "ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Unformatted ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Product ID",
+				"type": "String"
+			},
+			{
+				"name": "Change History",
+				"type": "String"
+			},
+			{
+				"name": "Shortcut URL",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

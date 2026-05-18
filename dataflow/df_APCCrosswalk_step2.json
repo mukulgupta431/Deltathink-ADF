@@ -1,0 +1,253 @@
+{
+	"name": "df_APCCrosswalk_step2",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCCrosswalk"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_APC_Crosswalk_APC_Map",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCCrosswalkMap"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCMaster_APCTitles",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCTitles"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Master_Crosswalk",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMasterCrosswalk"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_APC_Crosswalk_APCCrosswalkAll",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCCrosswalkAll"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "selectAPCTitles"
+				},
+				{
+					"name": "selectMasterCrosswalk"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Title_ID as integer,",
+				"          APC_ID as short,",
+				"          Match_using as string,",
+				"          Priority as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCCrosswalkMap",
+				"source(output(",
+				"          APC_ID as string,",
+				"          ISSN_L as string,",
+				"          Title_ID as string,",
+				"          Source_title as string,",
+				"          Title as string,",
+				"          Publisher as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Year as string,",
+				"          Model as string,",
+				"          APC as string,",
+				"          Source_title_history as string,",
+				"          Title_history as string,",
+				"          Publisher_history as string,",
+				"          Publisher_history_OA as string,",
+				"          Year_history as string,",
+				"          ID_history as string,",
+				"          wUID as string,",
+				"          Contiguous as string,",
+				"          Updates as string,",
+				"          Child_records as string,",
+				"          Change_publisher as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+				"source(output(",
+				"          Idx as short,",
+				"          Title_ID as integer,",
+				"          ISSN_L as string,",
+				"          Is_Indexed as boolean,",
+				"          Is_Market as boolean,",
+				"          Source as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Unpaywall_ID as short,",
+				"          UP_Title as string,",
+				"          UP_Source_title as string,",
+				"          UP_No_Data as boolean,",
+				"          UP_Sources_Types as string,",
+				"          Nordic_ID as integer,",
+				"          Nordic_Title as string,",
+				"          ERA_ID as integer,",
+				"          ERA_Title as string,",
+				"          SM_ID as long,",
+				"          DOAJ_ID as string,",
+				"          CWTS_ID as string,",
+				"          CWTS_Title as string,",
+				"          CWTS_Source_Title as string,",
+				"          APC_ID as short,",
+				"          APC_Title as string,",
+				"          APC_Source_title as string,",
+				"          Journals_Subjects as short,",
+				"          DTJT_Codes as string,",
+				"          Subject_Priority as short,",
+				"          Title_ID_OLD as integer,",
+				"          CBN_ID as integer,",
+				"          ASJCs as string,",
+				"          CS_ID as long,",
+				"          APC_ID_2022 as integer,",
+				"          Record_Created as timestamp,",
+				"          Has_Source_IDs as string,",
+				"          Use_Record as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceMasterCrosswalk",
+				"sourceAPCCrosswalkMap, selectAPCTitles join(toString(sourceAPCCrosswalkMap@APC_ID) == selectAPCTitles@APC_ID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1, selectMasterCrosswalk join(sourceAPCCrosswalkMap@Title_ID == selectMasterCrosswalk@Title_ID,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2 derive(Priority = Priority,",
+				"          Match_using = Match_using,",
+				"          APC_ID = sourceAPCCrosswalkMap@APC_ID,",
+				"          APC_Map_Title_ID = sourceAPCCrosswalkMap@Title_ID,",
+				"          Title_ID = selectMasterCrosswalk@Title_ID,",
+				"          APC_Titles_ISSN_L = selectAPCTitles@ISSN_L,",
+				"          APC_Title = selectAPCTitles@Title,",
+				"          APC_Source_title = selectAPCTitles@Source_title,",
+				"          Publisher = Publisher,",
+				"          Model = Model,",
+				"          MC_ISSN_L = selectMasterCrosswalk@ISSN_L,",
+				"          MC_Title = selectMasterCrosswalk@Title,",
+				"          MC_Source_title = selectMasterCrosswalk@Source_title,",
+				"          DTJT_Codes = DTJT_Codes) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Priority,",
+				"          Match_using,",
+				"          APC_ID,",
+				"          APC_Map_Title_ID,",
+				"          Title_ID,",
+				"          APC_Titles_ISSN_L,",
+				"          APC_Title,",
+				"          APC_Source_title,",
+				"          Publisher,",
+				"          Model,",
+				"          MC_ISSN_L,",
+				"          MC_Title,",
+				"          MC_Source_title,",
+				"          DTJT_Codes",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sourceAPCTitles select(mapColumn(",
+				"          APC_ID,",
+				"          ISSN_L,",
+				"          Source_title,",
+				"          Title,",
+				"          Publisher,",
+				"          Model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectAPCTitles",
+				"sourceMasterCrosswalk select(mapColumn(",
+				"          Title_ID,",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          DTJT_Codes",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectMasterCrosswalk",
+				"select1 aggregate(groupBy(Priority,",
+				"          Match_using,",
+				"          APC_ID,",
+				"          APC_Map_Title_ID,",
+				"          Title_ID,",
+				"          APC_Titles_ISSN_L,",
+				"          APC_Title,",
+				"          APC_Source_title,",
+				"          Publisher,",
+				"          Model,",
+				"          MC_ISSN_L,",
+				"          MC_Title,",
+				"          MC_Source_title,",
+				"          DTJT_Codes),",
+				"     dummy = count(APC_ID)) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          Priority,",
+				"          Match_using,",
+				"          APC_ID,",
+				"          APC_Map_Title_ID,",
+				"          Title_ID,",
+				"          APC_Titles_ISSN_L,",
+				"          APC_Title,",
+				"          APC_Source_title,",
+				"          Publisher,",
+				"          Model,",
+				"          MC_ISSN_L,",
+				"          MC_Title,",
+				"          MC_Source_title,",
+				"          DTJT_Codes",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 sort(asc(APC_ID, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAPCCrosswalkAll"
+			]
+		}
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"name": "ds_apa_kbart_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_apa_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/APA"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/kbart/journals/psycnet_psycarticles_2025-01-11.txt"
+			},
+			"columnDelimiter": "\t",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

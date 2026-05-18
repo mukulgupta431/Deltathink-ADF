@@ -1,0 +1,127 @@
+{
+	"name": "df_APCMasterListInsertPublisherManualShort",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCMasterList"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_APCMaster_APCTitles",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCTitles"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_apc_PublisherManual",
+						"type": "DatasetReference"
+					},
+					"name": "sourcePublisherManual"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_apc_PublisherManual",
+						"type": "DatasetReference"
+					},
+					"name": "sinkInsertIntoPubManual"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "selectColumnsForPublisherManual"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "unionToInsertNewPublisherShort"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          APC_ID as string,",
+				"          ISSN_L as string,",
+				"          Title_ID as string,",
+				"          Source_title as string,",
+				"          Title as string,",
+				"          Publisher as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Year as string,",
+				"          Model as string,",
+				"          APC as string,",
+				"          Source_title_history as string,",
+				"          Title_history as string,",
+				"          Publisher_history as string,",
+				"          Publisher_history_OA as string,",
+				"          Year_history as string,",
+				"          ID_history as string,",
+				"          wUID as string,",
+				"          Contiguous as string,",
+				"          Updates as string,",
+				"          Child_records as string,",
+				"          Change_publisher as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+				"source(output(",
+				"          Publisher_Raw as string,",
+				"          Publisher_Short as string,",
+				"          Imprint_OA as string,",
+				"          DAO as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourcePublisherManual",
+				"sourceAPCTitles, sourcePublisherManual join(Publisher == Publisher_Raw,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 filter(isNull(sourceAPCTitles@Publisher_Short)) ~> filter1",
+				"filter1 aggregate(groupBy(Publisher),",
+				"     cnt_dummy = count(Publisher)) ~> aggregate1",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          Publisher_Short = Pub_short,",
+				"          Imprint_OA,",
+				"          DAO",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumnsForPublisherManual",
+				"aggregate1 derive(Pub_short = left(Publisher,locate(' ',concat(Publisher,' '))),",
+				"          Imprint_OA = toString(null()),",
+				"          DAO = toString(null())) ~> derivedColumn1",
+				"selectColumnsForPublisherManual, sourcePublisherManual union(byName: true)~> unionToInsertNewPublisherShort",
+				"unionToInsertNewPublisherShort sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Publisher_Raw as string,",
+				"          Publisher_Short as string,",
+				"          Imprint_OA as string,",
+				"          DAO as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkInsertIntoPubManual"
+			]
+		}
+	}
+}

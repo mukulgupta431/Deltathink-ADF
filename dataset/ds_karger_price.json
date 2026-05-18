@@ -1,0 +1,61 @@
+{
+	"name": "ds_karger_price",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/31_Karger"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "karger_price_2025.csv",
+				"folderPath": "bronze/Karger/price",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Journal_code",
+				"type": "String"
+			},
+			{
+				"name": "Journal name",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 EUR Full article",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 EUR Short article",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 CHF Full article",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 CHF Short article",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 USD Full article",
+				"type": "String"
+			},
+			{
+				"name": "APC 2024 USD Short article",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

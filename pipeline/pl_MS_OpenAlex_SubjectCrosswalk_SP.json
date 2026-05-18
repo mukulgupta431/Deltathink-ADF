@@ -1,0 +1,65 @@
+{
+	"name": "pl_MS_OpenAlex_SubjectCrosswalk_SP",
+	"properties": {
+		"activities": [
+			{
+				"name": "Run MS_OpenAlex_Subject_Crosswalk_SP",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep.MS_Subject_Crosswalk();",
+						"queryTimeout": "10:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywall_sources_import",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/04_MSOpenAlex_Unpaywall_Crosswalk_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-11T08:17:29Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

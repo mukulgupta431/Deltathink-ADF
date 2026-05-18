@@ -1,0 +1,643 @@
+{
+	"name": "pl_import_APC_Tidy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load APCTidy data from local to Azure",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "APC_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "APC_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Title_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title_ID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_Short_OA",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher_OA_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher_OA_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Unique_title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Unique_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "wUID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "wUID",
+									"type": "UInt64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Import1ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import1ID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Import2ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import2ID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN1",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN1",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN2",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN2",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Model_Notes",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Model_Notes",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "APC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "APC",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "Currency",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Currency",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "DAO",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DAO",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "LicenseType",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LicenseType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "PublisherID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "PublisherID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "JoiningID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JoiningID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Imprint",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Imprint",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Society",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Society",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TJ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "TJ",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Audit",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Audit",
+									"type": "DateTime",
+									"physicalType": "timestamp"
+								}
+							},
+							{
+								"source": {
+									"name": "Import1_Old_Table",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import1_Old_Table",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Import1_Old_wUID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import1_Old_wUID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Import1_Old_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import1_Old_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Present_via",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Present_via",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Publication_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publication_Data_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Metrics_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Metrics_Data_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Import2_Old_Table",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import2_Old_Table",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Import2_Old_wUID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import2_Old_wUID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Import2_Old_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Import2_Old_Year",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_X",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_X",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSNs_in_order",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSNs_in_order",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "IY",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IY",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "IYP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "IYP",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Currency_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Currency_Data_Year",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "Inflation_Data_Year",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Inflation_Data_Year",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "years_zero_APC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "years_zero_APC",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "last_year_APC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "last_year_APC",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "last_year_model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "last_year_model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "next_year_model",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "next_year_model",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_APC_Tidy",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlAPC_TIDY",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/02_MSOpenAlex_DOI_Map_StoredProcedure/Import Source Tables/Crossref"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-17T11:31:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,237 @@
+{
+	"name": "17_df_sage_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_sage_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sage_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOATitle"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sage_bronze_goldOaTitle_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceGoldOATitle"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sage_bronze_goldOAPriceList",
+						"type": "DatasetReference"
+					},
+					"name": "sourceGoldOAPriceList"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sage_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sage_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkOAJournals"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PreparingList1"
+				},
+				{
+					"name": "selectRequiredColumns"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookupGoldOAPriceList"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Journal Code} as string,",
+				"          {SAGE (2025PREM2025) (PREM2025) Premier 2025 Titles (1056)} as string,",
+				"          ISSN as string,",
+				"          EISSN as string,",
+				"          URL as string,",
+				"          {Sales Discipline} as string,",
+				"          {Sub Discipline} as string,",
+				"          {Ranked/Awarded} as string,",
+				"          {Society Partner} as string,",
+				"          {Journal Type} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournal",
+				"source(output(",
+				"          Journal as string,",
+				"          {Journal Code} as string,",
+				"          ISSN as string,",
+				"          EISSN as string,",
+				"          {Sage Choice ($)} as short,",
+				"          {Sage Choice (£)} as double,",
+				"          {Sage Journals URL} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOATitle",
+				"source(output(",
+				"          {Journal Code} as string,",
+				"          {SAGE (2025GOLDOA25) (GOLDOA25) GOLD OA 2025 Titles (223)} as string,",
+				"          ISSN as string,",
+				"          EISSN as string,",
+				"          URL as string,",
+				"          {Sales Discipline} as string,",
+				"          {Sub Discipline} as string,",
+				"          {Ranked/Awarded} as string,",
+				"          {Society Partner} as string,",
+				"          {Journal Type} as string,",
+				"          {Gold Discount Eligible} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceGoldOATitle",
+				"source(output(",
+				"          {Journal Code} as string,",
+				"          TLA as string,",
+				"          {Journal Title.1} as string,",
+				"          {2025 List Price} as string,",
+				"          {2025 Currrent Price} as string,",
+				"          Currency as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceGoldOAPriceList",
+				"lookup1 derive(Publisher = :publisher_v,",
+				"          ISSN1 = iif(length(sourceAllJournal@ISSN) < 9 ,'',trim(sourceAllJournal@ISSN)),",
+				"          ISSN2 = iif(length(sourceAllJournal@EISSN) < 9 ,'',trim(sourceAllJournal@EISSN)),",
+				"          Title = trim({SAGE (2025PREM2025) (PREM2025) Premier 2025 Titles (1056)}),",
+				"          Source = 'Publisher Price List',",
+				"          Model = :model_v,",
+				"          {Model Notes} = toString(null()),",
+				"          APC = iif(",
+				"    isNull({Sage Choice ($)}),",
+				"    iif( :model_v =='Fully OA' || :model_v == 'Hybrid','0',toString({Sage Choice ($)})),",
+				"    toString({Sage Choice ($)})",
+				"    ),",
+				"          Currency = iif(isNull({Sage Choice ($)}),'','USD'),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = trim(sourceAllJournal@{Journal Code}),",
+				"          JoiningID = trim(sourceAllJournal@{Journal Code}),",
+				"          Imprint = toString(null()),",
+				"          Society = iif({Society Partner} == 'NA','',{Society Partner}),",
+				"          year_v := '2025',",
+				"          publisher_v := 'SAGE',",
+				"          model_v := iif(",
+				"    {Journal Type} == 'OA','Fully OA',",
+				"    iif({Journal Type} == 'Hybrid','Hybrid',",
+				"    'None')",
+				"    )",
+				"/* =_xlfn.SWITCH([@[Journal Type]],\"OA\",\"Fully OA\",\"Hybrid\",\"Hybrid\",\"None\") */) ~> PreparingList1",
+				"PreparingList1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"sourceAllJournal, sourceOATitle lookup(sourceAllJournal@{Journal Code} == sourceOATitle@{Journal Code},",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookupGoldOAPriceList derive(Publisher = :publisher_v,",
+				"          ISSN1 = trim(EISSN),",
+				"          ISSN2 = trim(ISSN),",
+				"          Title = trim({SAGE (2025GOLDOA25) (GOLDOA25) GOLD OA 2025 Titles (223)}),",
+				"          Source = \"Publisher's Website\",",
+				"          Model = 'Fully OA',",
+				"          {Model Notes} = toString(null()),",
+				"          APC = {2025 Currrent Price},",
+				"          Currency = iif(isNull({2025 Currrent Price}),'',Currency),",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = trim(sourceGoldOATitle@{Journal Code}),",
+				"          JoiningID = trim(sourceGoldOATitle@{Journal Code}),",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null()),",
+				"          year_v := '2025',",
+				"          publisher_v := 'SAGE') ~> derivedColumn1",
+				"sourceGoldOATitle, sourceGoldOAPriceList lookup(sourceGoldOATitle@{Journal Code} == sourceGoldOAPriceList@{Journal Code},",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupGoldOAPriceList",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkOAJournals"
+			]
+		}
+	}
+}

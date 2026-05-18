@@ -1,0 +1,73 @@
+{
+	"name": "ds_apc_JournalNames_clean",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/Generic"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "OADAT_dataprep_JournalNames_Clean_20250915_1154GMT+5:30.csv",
+				"folderPath": "journalnames_clean",
+				"fileSystem": "general"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Idx",
+				"type": "String"
+			},
+			{
+				"name": "Name_Raw",
+				"type": "String"
+			},
+			{
+				"name": "Name_Match",
+				"type": "String"
+			},
+			{
+				"name": "Name_Punct",
+				"type": "String"
+			},
+			{
+				"name": "Name_Abbrev",
+				"type": "String"
+			},
+			{
+				"name": "Name_Clean",
+				"type": "String"
+			},
+			{
+				"name": "Name_Abbrev_OLD",
+				"type": "String"
+			},
+			{
+				"name": "Source",
+				"type": "String"
+			},
+			{
+				"name": "Notes",
+				"type": "String"
+			},
+			{
+				"name": "done",
+				"type": "String"
+			},
+			{
+				"name": "bak",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,37 @@
+{
+	"name": "01_pl_populate_wiley_silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "04_df_wiley_processing",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Generic/apc/bronze to silver"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-02-18T07:07:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

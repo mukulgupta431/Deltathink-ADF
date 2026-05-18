@@ -1,0 +1,253 @@
+{
+	"name": "df_APCCrosswalk_step1",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCCrosswalk"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_APCMaster_APCTitles",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCTitles"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Master_Crosswalk",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMasterCrosswalk"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_APC_ISSNs",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAPCISSNs"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_APC_Crosswalk_APC_Map",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCMap"
+				}
+			],
+			"transformations": [
+				{
+					"name": "LeftjoinMasterCrosswalk"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "joinForSourceTitle"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "joinForTitle"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "union2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          APC_ID as string,",
+				"          ISSN_L as string,",
+				"          Title_ID as string,",
+				"          Source_title as string,",
+				"          Title as string,",
+				"          Publisher as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Year as string,",
+				"          Model as string,",
+				"          APC as string,",
+				"          Source_title_history as string,",
+				"          Title_history as string,",
+				"          Publisher_history as string,",
+				"          Publisher_history_OA as string,",
+				"          Year_history as string,",
+				"          ID_history as string,",
+				"          wUID as string,",
+				"          Contiguous as string,",
+				"          Updates as string,",
+				"          Child_records as string,",
+				"          Change_publisher as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+				"source(output(",
+				"          Idx as short,",
+				"          Title_ID as integer,",
+				"          ISSN_L as string,",
+				"          Is_Indexed as boolean,",
+				"          Is_Market as boolean,",
+				"          Source as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Unpaywall_ID as short,",
+				"          UP_Title as string,",
+				"          UP_Source_title as string,",
+				"          UP_No_Data as boolean,",
+				"          UP_Sources_Types as string,",
+				"          Nordic_ID as integer,",
+				"          Nordic_Title as string,",
+				"          ERA_ID as integer,",
+				"          ERA_Title as string,",
+				"          SM_ID as long,",
+				"          DOAJ_ID as string,",
+				"          CWTS_ID as string,",
+				"          CWTS_Title as string,",
+				"          CWTS_Source_Title as string,",
+				"          APC_ID as short,",
+				"          APC_Title as string,",
+				"          APC_Source_title as string,",
+				"          Journals_Subjects as short,",
+				"          DTJT_Codes as string,",
+				"          Subject_Priority as short,",
+				"          Title_ID_OLD as integer,",
+				"          CBN_ID as integer,",
+				"          ASJCs as string,",
+				"          CS_ID as long,",
+				"          APC_ID_2022 as integer,",
+				"          Record_Created as timestamp,",
+				"          Has_Source_IDs as string,",
+				"          Use_Record as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceMasterCrosswalk",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAPCISSNs",
+				"select2, select3 join(select2@ISSN_L == select3@ISSN_L,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> LeftjoinMasterCrosswalk",
+				"LeftjoinMasterCrosswalk filter(not(isNull(select3@Title_ID))",
+				"",
+				"/* Master_crosswalk.Title_ID is not null */) ~> filter1",
+				"filter1 derive(Title_ID = select3@Title_ID,",
+				"          APC_ID = select2@APC_ID,",
+				"          Match_using = concat('APC <> Titles ISSN-L: ',select2@ISSN_L),",
+				"          Priority = '1') ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Title_ID,",
+				"          APC_ID,",
+				"          Match_using,",
+				"          Priority",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sourceAPCTitles select(mapColumn(",
+				"          APC_ID,",
+				"          ISSN_L,",
+				"          Title_ID,",
+				"          Source_title,",
+				"          Title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"sourceMasterCrosswalk select(mapColumn(",
+				"          Title_ID,",
+				"          ISSN_L,",
+				"          APC_ID,",
+				"          Source_title,",
+				"          Title",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"union2 sort(asc(Title_ID, true)) ~> sort1",
+				"select2, select3 join(select2@Source_title == select3@Source_title,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinForSourceTitle",
+				"joinForSourceTitle filter(not(isNull(select3@Title_ID))) ~> filter2",
+				"filter2 derive(Title_ID = select3@Title_ID,",
+				"          APC_ID = select2@APC_ID,",
+				"          Match_using = concat('APC <> Master Source_title: ',select2@Source_title),",
+				"          Priority = '4') ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          Title_ID,",
+				"          APC_ID,",
+				"          Match_using,",
+				"          Priority",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select1, select4 union(byName: true)~> union1",
+				"select2, select3 join(select2@Title == select3@Title,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> joinForTitle",
+				"joinForTitle filter(not(isNull(select3@Title_ID))) ~> filter3",
+				"filter3 derive(Title_ID = select3@Title_ID,",
+				"          APC_ID = select2@APC_ID,",
+				"          Match_using = concat('APC <> Master Title: ',select2@Title),",
+				"          Priority = '5') ~> derivedColumn3",
+				"derivedColumn3 select(mapColumn(",
+				"          Title_ID,",
+				"          APC_ID,",
+				"          Match_using,",
+				"          Priority",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"union1, select5 union(byName: true)~> union2",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAPCMap"
+			]
+		}
+	}
+}

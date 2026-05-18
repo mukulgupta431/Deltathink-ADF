@@ -1,0 +1,98 @@
+{
+	"name": "ds_ms_load_OpenAPC_ImportTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "apc_de.csv",
+				"folderPath": "OpenAPC/OpenAPCImport",
+				"fileSystem": "general"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "institution",
+				"type": "String"
+			},
+			{
+				"name": "period",
+				"type": "String"
+			},
+			{
+				"name": "euro",
+				"type": "String"
+			},
+			{
+				"name": "doi",
+				"type": "String"
+			},
+			{
+				"name": "is_hybrid",
+				"type": "String"
+			},
+			{
+				"name": "publisher",
+				"type": "String"
+			},
+			{
+				"name": "journal_full_title",
+				"type": "String"
+			},
+			{
+				"name": "issn",
+				"type": "String"
+			},
+			{
+				"name": "issn_print",
+				"type": "String"
+			},
+			{
+				"name": "issn_electronic",
+				"type": "String"
+			},
+			{
+				"name": "issn_l",
+				"type": "String"
+			},
+			{
+				"name": "license_ref",
+				"type": "String"
+			},
+			{
+				"name": "indexed_in_crossref",
+				"type": "String"
+			},
+			{
+				"name": "pmid",
+				"type": "String"
+			},
+			{
+				"name": "pmcid",
+				"type": "String"
+			},
+			{
+				"name": "ut",
+				"type": "String"
+			},
+			{
+				"name": "url",
+				"type": "String"
+			},
+			{
+				"name": "doaj",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

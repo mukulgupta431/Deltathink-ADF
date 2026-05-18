@@ -1,0 +1,23 @@
+{
+	"name": "ds_ieee_titlelist",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/20_IEEE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Title-List.xlsx",
+				"folderPath": "bronze/IEEE/import",
+				"fileSystem": "apc"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

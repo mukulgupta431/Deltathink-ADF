@@ -1,0 +1,71 @@
+{
+	"name": "import_2024_apcImport2",
+	"properties": {
+		"folder": {
+			"name": "generic"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_apc_import2_2024",
+						"type": "DatasetReference"
+					},
+					"name": "apcImport12024Source"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_apcimport2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          wUID as string,",
+				"          Publisher as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          {Model Notes} as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as string,",
+				"          DAO as string,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Old_Table as string,",
+				"          Old_wUID as string,",
+				"          Old_Year as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> apcImport12024Source",
+				"apcImport12024Source sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('key',",
+				"          0,",
+				"          DAO,",
+				"          Publisher",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

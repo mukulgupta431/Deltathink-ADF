@@ -1,0 +1,13 @@
+{
+	"name": "dl_oadat_AzureSynapseArtifacts",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSynapseArtifacts",
+		"typeProperties": {
+			"endpoint": "https://oadat-workspace.dev.azuresynapse.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/66930ddf-fa17-4910-b3d8-e514f9eb05b0/resourceGroups/oadat/providers/Microsoft.Synapse/workspaces/oadat-workspace"
+		}
+	}
+}

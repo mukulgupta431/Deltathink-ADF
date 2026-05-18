@@ -1,0 +1,210 @@
+{
+	"name": "df_APCImport_Map",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCImportMap"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Tidy",
+						"type": "DatasetReference"
+					},
+					"name": "sourceImportTidy"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_issnToissnL",
+						"type": "DatasetReference"
+					},
+					"name": "sourceISSNToISSNL"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "CreateAPCTidyISSNLs"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          APC_ID as long,",
+				"          Title_ID as string,",
+				"          ISSN_L as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Publisher_OA_type as string,",
+				"          Unique_title as string,",
+				"          wUID as long,",
+				"          Import1ID as string,",
+				"          Import2ID as string,",
+				"          Publisher as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          Model_Notes as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as short,",
+				"          DAO as short,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Import1_Old_Table as string,",
+				"          Import1_Old_wUID as string,",
+				"          Import1_Old_Year as string,",
+				"          Present_via as string,",
+				"          Import2_Old_Table as string,",
+				"          Import2_Old_wUID as string,",
+				"          Import2_Old_Year as string,",
+				"          ISSN_X as string,",
+				"          ISSNs_in_order as string,",
+				"          IY as string,",
+				"          IYP as string,",
+				"          Publication_Data_Year as short,",
+				"          Metrics_Data_Year as short,",
+				"          Currency_Data_Year as short,",
+				"          Inflation_Data_Year as short,",
+				"          last_year_APC as string,",
+				"          years_zero_APC as boolean,",
+				"          last_year_model as string,",
+				"          next_year_model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceImportTidy",
+				"source(output(",
+				"          ISSN as string,",
+				"          ISSN_L as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceISSNToISSNL",
+				"filter1 derive(ISSN_L_via = iif(not(isNull(sourceISSNToISSNL@ISSN_L)),'ISSNtoISSN_L table',toString(null())),",
+				"          APC_ID = toLong(APC_ID),",
+				"          wUID = toLong(wUID)) ~> derivedColumn1",
+				"sourceImportTidy, sourceISSNToISSNL lookup(ISSN2 == ISSN,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"derivedColumn1 select(mapColumn(",
+				"          wUID,",
+				"          ISSN = ISSN1,",
+				"          ISSN_L = sourceISSNToISSNL@ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"lookup1 filter(not(isNull(ISSN1)) && (not(startsWith(Model_Notes, 'DELETE')) || isNull(Model_Notes))\r",
+				"\r",
+				"/* not(isNull(ISSN1)) */) ~> filter1",
+				"lookup2 filter(not(isNull(ISSN2)) && (not(startsWith(Model_Notes, 'DELETE')) || isNull(Model_Notes))\r",
+				"\r",
+				"/* not(isNull(ISSN2)) */) ~> filter2",
+				"sourceImportTidy, sourceISSNToISSNL lookup(ISSN1 == ISSN,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"filter2 derive(ISSN_L_via = iif(not(isNull(sourceISSNToISSNL@ISSN_L)),'ISSNtoISSN_L table',toString(null())),",
+				"          wUID = toLong(wUID),",
+				"          APC_ID = toLong(APC_ID)) ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          wUID,",
+				"          ISSN = ISSN1,",
+				"          ISSN_L = sourceISSNToISSNL@ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, select2 union(byName: true)~> union1",
+				"union1 sort(asc(ISSN, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          wUID as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          {Model Notes} as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as string,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Old_Table as string,",
+				"          Old_wUID as string,",
+				"          Old_Year as string,",
+				"          DAO as string,",
+				"          Publisher as string",
+				"     ),",
+				"     partitionFileNames:['MissingIssnl.csv'],",
+				"     truncate: true,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> CreateAPCTidyISSNLs"
+			]
+		}
+	}
+}

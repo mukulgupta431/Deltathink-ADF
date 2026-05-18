@@ -1,0 +1,256 @@
+{
+	"name": "pl_import_CrossRefImport_To_Tidy",
+	"properties": {
+		"activities": [
+			{
+				"name": "DF to cleanup columns and filter",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_ms_crossref_import_currentyear",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "upload cleaned data to crossref_import table",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "DF to cleanup columns and filter",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "MS_Crossref_tidy/processed/currentYear",
+							"wildcardFileName": "*",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "JournalTitle",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JournalTitle",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "JournalID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JournalID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "pissn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "pissn",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "eissn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "eissn",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "additionalIssns",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "additionalIssns",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issue_info",
+									"type": "String",
+									"physicalType": "text"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_crossref_import_currentYear_processed",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySQLCrossRef_Import",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "run SP Crossref_Import_Tidy to insert to tidy table",
+				"description": "run SP Crossref_Import_Tidy to insert import data to tidy table",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "upload cleaned data to crossref_import table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep. Crossref_Import_Tidy();",
+						"queryTimeout": "10:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySQLCrossRef_Import",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/02_MSOpenAlex_DOI_Map_StoredProcedure/Import Source Tables/Crossref"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-17T11:31:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

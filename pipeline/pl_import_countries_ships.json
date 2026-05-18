@@ -1,0 +1,237 @@
+{
+	"name": "pl_import_countries_ships",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load Countries ships",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "processed_v1/country_ship",
+							"wildcardFileName": "*.parquet",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "ParquetReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "sources_id",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "sources_id",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "year",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "year",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "oa_status",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "oa_status",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISO2_Code",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "ISO2_Code",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "type_crossref",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "type_crossref",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "journal_issn_l",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "journal_issn_l",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "license",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "license",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "UTF8"
+								},
+								"sink": {
+									"name": "host_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "articles",
+									"type": "Int64",
+									"physicalType": "INT64"
+								},
+								"sink": {
+									"name": "articles",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "articles_per_country_all",
+									"type": "Double",
+									"physicalType": "DOUBLE"
+								},
+								"sink": {
+									"name": "articles_per_country_all",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "articles_per_country_first",
+									"type": "Double",
+									"physicalType": "DOUBLE"
+								},
+								"sink": {
+									"name": "articles_per_country_first",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							},
+							{
+								"source": {
+									"name": "articles_per_country_corresp",
+									"type": "Double",
+									"physicalType": "DOUBLE"
+								},
+								"sink": {
+									"name": "articles_per_country_corresp",
+									"type": "Double",
+									"physicalType": "double"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_openAlex_country_ships",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywallCountryShip",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/13_MS_Consulting"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-10-24T06:34:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,96 @@
+{
+	"name": "df_ms_crossref_Tidy_import",
+	"properties": {
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ms_crossrefTidy_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_ms_crossrefTidy_csv_processed",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          JournalTitle as string,",
+				"          Crossref_ID as integer,",
+				"          Publisher as string,",
+				"          pissn as string,",
+				"          eissn as string,",
+				"          additionalIssns as string,",
+				"          doi as string,",
+				"          issue_info as string,",
+				"          DAO as string,",
+				"          CleanedTitle as string,",
+				"          AbbrevTitle as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"derivedColumn1 select(mapColumn(",
+				"          JournalTitle,",
+				"          Crossref_ID,",
+				"          Publisher,",
+				"          pissn,",
+				"          eissn,",
+				"          additionalIssns,",
+				"          doi,",
+				"          issue_info,",
+				"          DAO = new_dao,",
+				"          CleanedTitle = new_cleanedTitle,",
+				"          AbbrevTitle = new_AbbrevTitle",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"source1 derive(new_dao = iif(\r",
+				"   !isNull(toInteger(substring(DAO,1,4))) \r",
+				"   && toInteger(substring(DAO,1,4)) >= 1900 \r",
+				"   && toInteger(substring(DAO,1,4)) <= 2100,\r",
+				"   substring(DAO,1,16),   \r",
+				"   toString(null())\r",
+				"),",
+				"          new_cleanedTitle = substring(CleanedTitle, 1, 255),",
+				"          new_AbbrevTitle = substring(AbbrevTitle, 1, 255)) ~> derivedColumn1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          JournalTitle as string,",
+				"          JournalID as string,",
+				"          Publisher as string,",
+				"          pissn as string,",
+				"          eissn as string,",
+				"          additionalIssns as string,",
+				"          doi as string,",
+				"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

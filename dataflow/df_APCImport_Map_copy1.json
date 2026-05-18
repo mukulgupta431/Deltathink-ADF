@@ -1,0 +1,251 @@
+{
+	"name": "df_APCImport_Map_copy1",
+	"properties": {
+		"folder": {
+			"name": "apc/silver to gold/APCImportMap"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_APCImport_Tidy",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_issnToissnL",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAPCTidyISSNLs"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "lookup2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "APCTidyISSNLs"
+				},
+				{
+					"name": "filter3"
+				},
+				{
+					"name": "derivedMissingTable"
+				},
+				{
+					"name": "filter4"
+				},
+				{
+					"name": "selectwUID"
+				},
+				{
+					"name": "lookup3"
+				},
+				{
+					"name": "lookup4"
+				},
+				{
+					"name": "derivedViawUID"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          APC_ID as short,",
+				"          Title_ID as string,",
+				"          ISSN_L as string,",
+				"          Publisher_Short as string,",
+				"          Publisher_Short_OA as string,",
+				"          Publisher_OA_type as string,",
+				"          Unique_title as string,",
+				"          wUID as short,",
+				"          Import1ID as string,",
+				"          Import2ID as string,",
+				"          Publisher as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          Model_Notes as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as short,",
+				"          DAO as short,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Import1_Old_Table as string,",
+				"          Import1_Old_wUID as string,",
+				"          Import1_Old_Year as string,",
+				"          Present_via as string,",
+				"          Import2_Old_Table as string,",
+				"          Import2_Old_wUID as string,",
+				"          Import2_Old_Year as string,",
+				"          ISSN_X as string,",
+				"          ISSNs_in_order as string,",
+				"          IY as string,",
+				"          IYP as string,",
+				"          Publication_Data_Year as short,",
+				"          Metrics_Data_Year as short,",
+				"          Currency_Data_Year as short,",
+				"          Inflation_Data_Year as short,",
+				"          last_year_APC as string,",
+				"          years_zero_APC as boolean,",
+				"          last_year_model as string,",
+				"          next_year_model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          ISSN as string,",
+				"          ISSN_L as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"filter1 derive(ISSN_L_via = 'ISSNtoISSN_L table') ~> derivedColumn1",
+				"source1, source2 lookup(ISSN2 == ISSN,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup2",
+				"derivedColumn1 select(mapColumn(",
+				"          wUID,",
+				"          ISSN = ISSN1,",
+				"          ISSN_L = source2@ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"lookup1 filter(not(isNull(ISSN1))) ~> filter1",
+				"lookup2 filter(not(isNull(ISSN2))) ~> filter2",
+				"source1, source2 lookup(ISSN1 == ISSN,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"filter2 derive(ISSN_L_via = 'ISSNtoISSN_L table') ~> derivedColumn2",
+				"derivedColumn2 select(mapColumn(",
+				"          wUID,",
+				"          ISSN = ISSN1,",
+				"          ISSN_L = source2@ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, select2 union(byName: true)~> union1",
+				"union1 select(mapColumn(",
+				"          wUID,",
+				"          ISSN,",
+				"          ISSN_L,",
+				"          Title,",
+				"          Source_title,",
+				"          Publisher,",
+				"          PublisherID,",
+				"          ISSN_L_via",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> APCTidyISSNLs",
+				"derivedMissingTable filter(not(isNull(ISSN_L))) ~> filter3",
+				"lookup3 derive(wUID = union1@wUID,",
+				"          ISSN_L = iif(not(isNull(ISSN_L)),ISSN_L,toString(null()))) ~> derivedMissingTable",
+				"union1 filter(isNull(ISSN_L)) ~> filter4",
+				"filter4 select(mapColumn(",
+				"          wUID",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectwUID",
+				"union1, selectwUID lookup(union1@wUID == selectwUID@wUID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup3",
+				"APCTidyISSNLs, derivedMissingTable lookup(APCTidyISSNLs@wUID == derivedMissingTable@wUID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup4",
+				"lookup4 derive(ISSN_L = :missing_ISSN_L_v,",
+				"          ISSN_L_via = iif(not(isNull(:missing_ISSN_L_v)),'wUID',toString(null())),",
+				"          missing_ISSN_L_v := iif(isNull(APCTidyISSNLs@ISSN_L),derivedMissingTable@ISSN_L,APCTidyISSNLs@ISSN_L)) ~> derivedViawUID",
+				"derivedViawUID sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          wUID as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Title as string,",
+				"          Source as string,",
+				"          Model as string,",
+				"          {Model Notes} as string,",
+				"          APC as string,",
+				"          Currency as string,",
+				"          Year as string,",
+				"          LicenseType as string,",
+				"          PublisherID as string,",
+				"          JoiningID as string,",
+				"          Imprint as string,",
+				"          Society as string,",
+				"          TJ as string,",
+				"          Audit as string,",
+				"          Old_Table as string,",
+				"          Old_wUID as string,",
+				"          Old_Year as string,",
+				"          DAO as string,",
+				"          Publisher as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkAPCTidyISSNLs"
+			]
+		}
+	}
+}

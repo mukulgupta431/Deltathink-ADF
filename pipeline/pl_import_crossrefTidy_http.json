@@ -1,0 +1,159 @@
+{
+	"name": "pl_import_crossrefTidy_http",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "JournalTitle",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JournalTitle",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "JournalID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Crossref_ID",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "pissn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "pissn",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "eissn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "eissn",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "additionalIssns",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "additionalIssns",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issue_info",
+									"type": "String",
+									"physicalType": "text"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_CrossRef_http",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySQLCrossRef_Tidy",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-08-19T09:21:40Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

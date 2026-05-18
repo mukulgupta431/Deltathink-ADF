@@ -1,0 +1,362 @@
+{
+	"name": "05_df_WoltersKluwerHealth_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "sourceKbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceHybrid"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceOaJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_societyTable",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSocietyTable"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_bronze_ReplaceTitles",
+						"type": "DatasetReference"
+					},
+					"name": "sourceRevisedTitles"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkAllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkOAJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_WoltersKluwerHealth_silver_both_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "lookupKbart"
+				},
+				{
+					"name": "selectKbart"
+				},
+				{
+					"name": "HybFOAFoundInKbart"
+				},
+				{
+					"name": "lookupSociety"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "unionHybridFOA"
+				},
+				{
+					"name": "select5"
+				},
+				{
+					"name": "lookupSocietyTable"
+				},
+				{
+					"name": "lookupHybFOA"
+				},
+				{
+					"name": "ChangingTitleThatGotChanged"
+				},
+				{
+					"name": "lookupForRevisedTitles"
+				},
+				{
+					"name": "unionAllAndExclusivelyInHybOA",
+					"description": "Combining rows from All Journals(inclusive of Hyb & OA journals) and Journals that is available only in Hyb & OA but not in ALL"
+				},
+				{
+					"name": "existsInHybOANotInAllJournal"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as integer,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as integer,",
+				"          access_type as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceKbart",
+				"source(output(",
+				"          Specialty as string,",
+				"          {Journal title} as string,",
+				"          {APC (CCBY-NC-ND)} as string,",
+				"          {APC (CCBY)} as string,",
+				"          print_issn as string,",
+				"          electronic_issn as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceHybrid",
+				"source(output(",
+				"          {Journal Name} as string,",
+				"          {Journal URL} as string,",
+				"          {Impact Factor} as double,",
+				"          {Original Research} as string,",
+				"          {Case Reports/Study Protocols} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceOaJournal",
+				"source(output(",
+				"          Title as string,",
+				"          Society as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceSocietyTable",
+				"source(output(",
+				"          Find as string,",
+				"          Replace as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceRevisedTitles",
+				"lookupHybFOA derive(Publisher = :publisher_V,",
+				"          ISSN1 = trim(online_identifier),",
+				"          ISSN2 = trim(print_identifier),",
+				"          Title = trim(publication_title),",
+				"          Source = :source_v,",
+				"          Model = iif(isNull(Model),\"None\",Model)",
+				"",
+				" /* =IFERROR(INDEX(List2[Model],[@[Idx List 2]]),\"None\")....if the journal is found in list2 tider, then take the model as it is else none */,",
+				"          {Model Notes} = toString(null()) ",
+				"/* =_xlfn.TEXTJOIN(\", \",TRUE,IF(ISNA([@[Idx MedKnow Title]]),\"\",\"DELETE - duplicate\"),IFERROR(INDEX(List2[Model Notes],[@[Idx List 2]]),\"\"))",
+				"*/,",
+				"          APC = APC,",
+				"          Currency = Currency,",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = trim(replace(replace(publisher_name, 'Wolters Kluwer Health _ ', ''), '(Journals)', '')),",
+				"          Society = sourceSocietyTable@Society,",
+				"          year_v := '2025',",
+				"          publisher_V := 'Wolters Kluwer Health',",
+				"          source_v := 'Publisher Price List') ~> derivedColumn1",
+				"lookupSociety derive(Publisher = :publisher_V,",
+				"          ISSN1 = trim(online_identifier),",
+				"          ISSN2 = trim(print_identifier),",
+				"          Source = :source_v,",
+				"          Currency = 'USD',",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          Imprint = trim(replace(replace(publisher_name, 'Wolters Kluwer Health _ ', ''), '(Journals)', '')),",
+				"          Society = Society,",
+				"          year_v := '2025',",
+				"          publisher_V := 'Wolters Kluwer Health',",
+				"          source_v := 'Publisher Price List') ~> derivedColumn2",
+				"select5, sourceKbart lookup(trim(Title) == trim(publication_title),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupKbart",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectKbart",
+				"derivedColumn2 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = select5@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> HybFOAFoundInKbart",
+				"lookupKbart, sourceSocietyTable lookup(soundex(trim(select5@Title)) == soundex(trim(sourceSocietyTable@Title)),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupSociety",
+				"sourceOaJournal derive(Title = trim({Journal Name}),",
+				"          Model = \"Fully OA\",",
+				"          {Model Notes} = toString(null()),",
+				"          APC = replace(replace(replace(:apc_FOA_v,'$',''),',',''),'No fee','0'),",
+				"          apc_FOA_v := iif({Original Research} == 'N/A',{Case Reports/Study Protocols},{Original Research})) ~> derivedColumn3",
+				"sourceHybrid derive(Title = trim({Journal title}),",
+				"          Model = \"Hybrid\",",
+				"          {Model Notes} = iif(isNull({APC (CCBY)}), \"CC BY-NC-ND only\",\"\")  /* =IF([@[APC (CCBY)]]=\"N/A\",\"CC BY-NC-ND only\",\"\")*/,",
+				"          APC = replace(replace(:apv_hybrid_v, \"$\",''),',',''),",
+				"          {License Types} = toString(null()),",
+				"          apv_hybrid_v := iif({APC (CCBY)} == 'N/A',{APC (CCBY-NC-ND)},{APC (CCBY)})",
+				"",
+				"/* =VALUE(SUBSTITUTE(IF([@[APC (CCBY)]]=\"N/A\",[@[APC (CCBY-NC-ND)]],[@[APC (CCBY)]]),\"$\",\"\")) */) ~> derivedColumn4",
+				"derivedColumn4 select(mapColumn(",
+				"          Title,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"derivedColumn3 select(mapColumn(",
+				"          Title,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select3, select4 union(byName: true)~> unionHybridFOA",
+				"ChangingTitleThatGotChanged select(mapColumn(",
+				"          Title,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select5",
+				"sourceKbart, sourceSocietyTable lookup(soundex(trim(publication_title)) == soundex(trim(Title)),",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupSocietyTable",
+				"lookupSocietyTable, HybFOAFoundInKbart lookup(title_id == JoiningID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupHybFOA",
+				"lookupForRevisedTitles derive(Title = iif(not(isNull(Find)),trim(Replace),\r",
+				"    iif((Title == 'SHOCK%'),'Shock',trim(Title))\r",
+				"    )\r",
+				"/* Discrepancies observed in few Titles between Hyb & OA journals names and Kbart Titles. Hence hardcoding using to Find and Replace csv file */) ~> ChangingTitleThatGotChanged",
+				"unionHybridFOA, sourceRevisedTitles lookup(Title == Find,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupForRevisedTitles",
+				"existsInHybOANotInAllJournal, HybFOAFoundInKbart union(byName: true)~> unionAllAndExclusivelyInHybOA",
+				"selectKbart, HybFOAFoundInKbart exists(selectKbart@JoiningID == HybFOAFoundInKbart@JoiningID,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> existsInHybOANotInAllJournal",
+				"selectKbart sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WolterKluwerSilverAll.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkAllJournal",
+				"HybFOAFoundInKbart sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WolterKluwerSilverOA.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sinkOAJournal",
+				"unionAllAndExclusivelyInHybOA sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['WolterKluwerSilverBoth.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

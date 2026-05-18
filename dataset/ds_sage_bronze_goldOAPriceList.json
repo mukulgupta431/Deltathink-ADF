@@ -1,0 +1,84 @@
+{
+	"name": "ds_sage_bronze_goldOAPriceList",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/17_sage"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/SAGE/gold-oa-pricelist",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Coden",
+				"type": "String"
+			},
+			{
+				"name": "Publication",
+				"type": "String"
+			},
+			{
+				"name": "First Year of Publication*",
+				"type": "String"
+			},
+			{
+				"name": "Open Access Options? acsopenscience.org",
+				"type": "String"
+			},
+			{
+				"name": "Access Method for non-OA Content",
+				"type": "String"
+			},
+			{
+				"name": "First Year Available with a Front-File Subscription**",
+				"type": "String"
+			},
+			{
+				"name": "URL",
+				"type": "String"
+			},
+			{
+				"name": "Issues Per Year Online",
+				"type": "String"
+			},
+			{
+				"name": "Print ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Print Svc Code",
+				"type": "String"
+			},
+			{
+				"name": "Web ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Included in All Publications Package",
+				"type": "String"
+			},
+			{
+				"name": "Included in ACS Core Plus Package",
+				"type": "String"
+			},
+			{
+				"name": "Optional in Science Essentials Package",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

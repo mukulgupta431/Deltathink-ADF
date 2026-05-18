@@ -1,0 +1,186 @@
+{
+	"name": "20_df_mit_press",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver/Misc"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_mit_press_hybrid_journals",
+						"type": "DatasetReference"
+					},
+					"name": "hybridJournals"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_mit_press_gold_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "goldOAJournals"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_mit_press_diamond_oa_journals",
+						"type": "DatasetReference"
+					},
+					"name": "diamonOAJournals"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_mit_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "SilverAllJournals"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenHybrid"
+				},
+				{
+					"name": "flattenDiamonOAJourns"
+				},
+				{
+					"name": "flattenGoldOAJournals"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "union2"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          hybrid_open_access_journals as (title as string, title_url as string, Online_ISSN as string, Print_ISSN as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> hybridJournals",
+				"source(output(",
+				"          gold_open_access_journals as (APC as short, Online_ISSN as string, Print_ISSN as string, title as string, title_url as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> goldOAJournals",
+				"source(output(",
+				"          diamond_open_access_journals as (title as string, title_url as string, Online_ISSN as string, Print_ISSN as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> diamonOAJournals",
+				"hybridJournals foldDown(unroll(hybrid_open_access_journals),",
+				"     mapColumn(",
+				"          title = hybrid_open_access_journals.title,",
+				"          title_url = hybrid_open_access_journals.title_url,",
+				"          Online_ISSN = hybrid_open_access_journals.Online_ISSN,",
+				"          Print_ISSN = hybrid_open_access_journals.Print_ISSN",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenHybrid",
+				"diamonOAJournals foldDown(unroll(diamond_open_access_journals),",
+				"     mapColumn(",
+				"          title = diamond_open_access_journals.title,",
+				"          title_url = diamond_open_access_journals.title_url,",
+				"          Online_ISSN = diamond_open_access_journals.Online_ISSN,",
+				"          Print_ISSN = diamond_open_access_journals.Print_ISSN",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenDiamonOAJourns",
+				"goldOAJournals foldDown(unroll(gold_open_access_journals),",
+				"     mapColumn(",
+				"          title = gold_open_access_journals.title,",
+				"          title_url = gold_open_access_journals.title_url,",
+				"          Online_ISSN = gold_open_access_journals.Online_ISSN,",
+				"          Print_ISSN = gold_open_access_journals.Print_ISSN,",
+				"          APC = gold_open_access_journals.APC",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenGoldOAJournals",
+				"union2 derive(Publisher = \"MIT Press\",",
+				"          Source = \"Publisher Website via Misc Publisher APCs list\",",
+				"          Currency = \"USD\",",
+				"          Year = \"2025\",",
+				"          {License Types} = \"CC BY\",",
+				"          JoiningID = PublisherID,",
+				"          Society = toString(null()),",
+				"          Imprint = toString(null())) ~> derivedColumn1",
+				"flattenHybrid derive(ISSN1 = Online_ISSN,",
+				"          ISSN2 = Print_ISSN,",
+				"          Title = title,",
+				"          Model = \"Hybrid\",",
+				"          {Model Notes} = toString(null()),",
+				"          APC = 1800,",
+				"          PublisherID = substringIndex(title_url, '/', -1),",
+				"          {Publisher URL} = title_url) ~> derivedColumn2",
+				"flattenGoldOAJournals derive(ISSN1 = Online_ISSN,",
+				"          ISSN2 = Print_ISSN,",
+				"          Title = title,",
+				"          Model = \"Fully OA\",",
+				"          {Model Notes} = toString(null()),",
+				"          APC = APC,",
+				"          PublisherID = substringIndex(title_url, '/', -1),",
+				"          {Publisher URL} = title_url) ~> derivedColumn3",
+				"flattenDiamonOAJourns derive(ISSN1 = Online_ISSN,",
+				"          ISSN2 = Print_ISSN,",
+				"          Title = title,",
+				"          Model = \"Fully OA\",",
+				"          {Model Notes} = \"Diamond\",",
+				"          APC = 0,",
+				"          PublisherID = substringIndex(title_url, '/', -1),",
+				"          {Publisher URL} = title_url) ~> derivedColumn4",
+				"derivedColumn2, derivedColumn3 union(byName: true)~> union1",
+				"union1, derivedColumn4 union(byName: true)~> union2",
+				"derivedColumn1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title = union2@Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SilverAllJournals"
+			]
+		}
+	}
+}

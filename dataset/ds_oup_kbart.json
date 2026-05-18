@@ -1,0 +1,160 @@
+{
+	"name": "ds_oup_kbart",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/24_OUP"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/OUP/kbart",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "publication_title",
+				"type": "String"
+			},
+			{
+				"name": "print_identifier",
+				"type": "String"
+			},
+			{
+				"name": "online_identifier",
+				"type": "String"
+			},
+			{
+				"name": "date_first_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "num_first_vol_online",
+				"type": "String"
+			},
+			{
+				"name": "num_first_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "date_last_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "num_last_vol_online",
+				"type": "String"
+			},
+			{
+				"name": "num_last_issue_online",
+				"type": "String"
+			},
+			{
+				"name": "title_url",
+				"type": "String"
+			},
+			{
+				"name": "first_author",
+				"type": "String"
+			},
+			{
+				"name": "title_id",
+				"type": "String"
+			},
+			{
+				"name": "embargo_info",
+				"type": "String"
+			},
+			{
+				"name": "coverage_depth",
+				"type": "String"
+			},
+			{
+				"name": "notes",
+				"type": "String"
+			},
+			{
+				"name": "publisher_name",
+				"type": "String"
+			},
+			{
+				"name": "publication_type",
+				"type": "String"
+			},
+			{
+				"name": "date_monograph_published_print",
+				"type": "String"
+			},
+			{
+				"name": "date_monograph_published_online",
+				"type": "String"
+			},
+			{
+				"name": "monograph_volume",
+				"type": "String"
+			},
+			{
+				"name": "monograph_edition",
+				"type": "String"
+			},
+			{
+				"name": "first_editor",
+				"type": "String"
+			},
+			{
+				"name": "parent_publication_title_id",
+				"type": "String"
+			},
+			{
+				"name": "preceding_publication_title_id",
+				"type": "String"
+			},
+			{
+				"name": "access_type",
+				"type": "String"
+			},
+			{
+				"name": "OCN",
+				"type": "String"
+			},
+			{
+				"name": "_c26",
+				"type": "String"
+			},
+			{
+				"name": "MARC Control Number",
+				"type": "String"
+			},
+			{
+				"name": "Subject",
+				"type": "String"
+			},
+			{
+				"name": "Collections",
+				"type": "String"
+			},
+			{
+				"name": "Year Started at OUP",
+				"type": "String"
+			},
+			{
+				"name": "Title History",
+				"type": "String"
+			},
+			{
+				"name": "Current Title",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

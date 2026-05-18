@@ -1,0 +1,344 @@
+{
+	"name": "pl_import_OpenAPCImport",
+	"properties": {
+		"activities": [
+			{
+				"name": "Load into OpenAPC_Import Table",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "institution",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "institution",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "period",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "period",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "euro",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "euro",
+									"type": "Decimal",
+									"physicalType": "decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "doi",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "is_hybrid",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "is_hybrid",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "publisher",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "publisher",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "journal_full_title",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "journal_full_title",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "issn",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_print",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_print",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_electronic",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_electronic",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "issn_l",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "license_ref",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "license_ref",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "indexed_in_crossref",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "indexed_in_crossref",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "pmid",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "pmid",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "pmcid",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "pmcid",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ut",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ut",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "url",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "url",
+									"type": "String",
+									"physicalType": "text"
+								}
+							},
+							{
+								"source": {
+									"name": "doaj",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "doaj",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_load_OpenAPC_ImportTable",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlOpenAPCImport",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Run OpenAPC_import_tidy SP",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Load into OpenAPC_Import Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureMySqlSource",
+						"query": "call oadat_dataprep.OpenAPC_import_tidy();",
+						"queryTimeout": "10:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureMySqlOpenAPCImport",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Test_StoredProc",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/02_MSOpenAlex_DOI_Map_StoredProcedure/Import Source Tables"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-17T11:31:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

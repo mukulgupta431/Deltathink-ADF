@@ -1,0 +1,204 @@
+{
+	"name": "ds_wiley_bronze_all_journals",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/01_Bronze layer/04_wiley"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze/wiley/all",
+				"fileSystem": "apc"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Journal Group code (numeric)",
+				"type": "String"
+			},
+			{
+				"name": "Journal Group code (alpha)",
+				"type": "String"
+			},
+			{
+				"name": "MJ code",
+				"type": "String"
+			},
+			{
+				"name": "Print ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Print Journal Code",
+				"type": "String"
+			},
+			{
+				"name": "Digital ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Digital Journal Code",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Print Material Number",
+				"type": "String"
+			},
+			{
+				"name": "Print Status",
+				"type": "String"
+			},
+			{
+				"name": "Digital Material Number",
+				"type": "String"
+			},
+			{
+				"name": "Digital Status",
+				"type": "String"
+			},
+			{
+				"name": "MultiMedia SAP Material",
+				"type": "String"
+			},
+			{
+				"name": "FTE Price Model",
+				"type": "String"
+			},
+			{
+				"name": "DOI",
+				"type": "String"
+			},
+			{
+				"name": "URL",
+				"type": "String"
+			},
+			{
+				"name": "General Subject Category",
+				"type": "String"
+			},
+			{
+				"name": "Primary Subject Area",
+				"type": "String"
+			},
+			{
+				"name": "Media Type",
+				"type": "String"
+			},
+			{
+				"name": "External notes PRICING",
+				"type": "String"
+			},
+			{
+				"name": "Hybrid Open Access",
+				"type": "String"
+			},
+			{
+				"name": "Available For POD",
+				"type": "String"
+			},
+			{
+				"name": "Included In Database",
+				"type": "String"
+			},
+			{
+				"name": "Full Collection",
+				"type": "String"
+			},
+			{
+				"name": "STM Collection",
+				"type": "String"
+			},
+			{
+				"name": "SSH Collection",
+				"type": "String"
+			},
+			{
+				"name": "M&N Collection",
+				"type": "String"
+			},
+			{
+				"name": "Not in any Standard Collections",
+				"type": "String"
+			},
+			{
+				"name": "R4L Collection",
+				"type": "String"
+			},
+			{
+				"name": "Current Year Volume",
+				"type": "String"
+			},
+			{
+				"name": "Current Year Issue",
+				"type": "String"
+			},
+			{
+				"name": "Frontfile Start Year",
+				"type": "String"
+			},
+			{
+				"name": "Frontfile Start Volume",
+				"type": "String"
+			},
+			{
+				"name": "Year of First Backfile Volume",
+				"type": "String"
+			},
+			{
+				"name": "First Backfile Volume Available",
+				"type": "String"
+			},
+			{
+				"name": "First Backfile Isssue Available",
+				"type": "String"
+			},
+			{
+				"name": "Year of Last Backfile Volume",
+				"type": "String"
+			},
+			{
+				"name": "Last Backfile Volume Available",
+				"type": "String"
+			},
+			{
+				"name": "Last Backfile Issue Available",
+				"type": "String"
+			},
+			{
+				"name": "Renewal Subscription Type",
+				"type": "String"
+			},
+			{
+				"name": "Journal Owned by",
+				"type": "String"
+			},
+			{
+				"name": "Impact Factor 2023",
+				"type": "String"
+			},
+			{
+				"name": "clean_title",
+				"type": "String"
+			},
+			{
+				"name": "issnl",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

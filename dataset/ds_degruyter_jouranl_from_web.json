@@ -1,0 +1,21 @@
+{
+	"name": "ds_degruyter_jouranl_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_degruyter_web_asset",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/29_de Gruyter"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/docs/DeGruyter_Journal_Price_List_2025__USD__2024-11-10.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

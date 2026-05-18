@@ -1,0 +1,109 @@
+{
+	"name": "ds_openAlex_country_ships",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "openAlex"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed_v1/country_ship",
+				"fileSystem": "openalex"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "year",
+				"type": "UTF8"
+			},
+			{
+				"name": "oa_status",
+				"type": "UTF8"
+			},
+			{
+				"name": "ISO2_Code",
+				"type": "UTF8"
+			},
+			{
+				"name": "type",
+				"type": "UTF8"
+			},
+			{
+				"name": "type_crossref",
+				"type": "UTF8"
+			},
+			{
+				"name": "license",
+				"type": "UTF8"
+			},
+			{
+				"name": "version",
+				"type": "UTF8"
+			},
+			{
+				"name": "host_type",
+				"type": "UTF8"
+			},
+			{
+				"name": "articles",
+				"type": "INT64"
+			},
+			{
+				"name": "articles_all",
+				"type": "INT64"
+			},
+			{
+				"name": "articles_first",
+				"type": "INT64"
+			},
+			{
+				"name": "articles_corresp",
+				"type": "INT64"
+			},
+			{
+				"name": "articles_best",
+				"type": "INT64"
+			},
+			{
+				"name": "count_all",
+				"type": "INT64"
+			},
+			{
+				"name": "count_first",
+				"type": "INT64"
+			},
+			{
+				"name": "count_corresp",
+				"type": "INT64"
+			},
+			{
+				"name": "count_best",
+				"type": "INT64"
+			},
+			{
+				"name": "articles_per_country_all",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "articles_per_country_first",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "articles_per_country_corresp",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "articles_per_country_best_guess",
+				"type": "DOUBLE"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,154 @@
+{
+	"name": "24_OUP_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_oup_kbart",
+						"type": "DatasetReference"
+					},
+					"name": "kbart"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_oup_price_list",
+						"type": "DatasetReference"
+					},
+					"name": "priceList"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_oup_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "AllJournals"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedImportcolumns"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "derivedAPCRelatedColumns"
+				},
+				{
+					"name": "SelectImportColumnsFromAPC"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          publication_title as string,",
+				"          print_identifier as string,",
+				"          online_identifier as string,",
+				"          date_first_issue_online as string,",
+				"          num_first_vol_online as string,",
+				"          num_first_issue_online as string,",
+				"          date_last_issue_online as string,",
+				"          num_last_vol_online as string,",
+				"          num_last_issue_online as string,",
+				"          title_url as string,",
+				"          first_author as string,",
+				"          title_id as string,",
+				"          embargo_info as string,",
+				"          coverage_depth as string,",
+				"          notes as string,",
+				"          publisher_name as string,",
+				"          publication_type as string,",
+				"          date_monograph_published_print as string,",
+				"          date_monograph_published_online as string,",
+				"          monograph_volume as string,",
+				"          monograph_edition as string,",
+				"          first_editor as string,",
+				"          parent_publication_title_id as string,",
+				"          preceding_publication_title_id as string,",
+				"          access_type as string,",
+				"          OCN as string,",
+				"          {_c26} as string,",
+				"          {MARC Control Number} as string,",
+				"          Subject as string,",
+				"          Collections as string,",
+				"          {Year Started at OUP} as string,",
+				"          {Title History} as string,",
+				"          {Current Title} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> kbart",
+				"source(output(",
+				"          Journal as string,",
+				"          {CC-BY} as string,",
+				"          {CC BY-NC} as string,",
+				"          {CC BY-NC-ND} as string,",
+				"          {See Non-standard tab?} as string,",
+				"          {APC Base Currency} as string,",
+				"          {2024 price} as string,",
+				"          {Member discount} as string,",
+				"          ISSN as string,",
+				"          {Journal Type} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> priceList",
+				"kbart derive(Publisher = :publisher_v,",
+				"          ISSN1 = online_identifier,",
+				"          ISSN2 = print_identifier,",
+				"          Title = publication_title,",
+				"          Source = :source_v,",
+				"          Year = :year_v,",
+				"          PublisherID = title_id,",
+				"          JoiningID = title_id,",
+				"          publisher_v := \"OUP\",",
+				"          source_v := \"Publisher Price List\",",
+				"          year_v := \"2025\") ~> derivedImportcolumns",
+				"derivedImportcolumns, priceList join(ISSN1 == ISSN,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 derive(Model = iif({Journal Type}=='Full Open Access', 'Fully OA', iif({Journal Type}=='Hybrid', 'Hybrid', '')),",
+				"          {Model Notes} = \"\",",
+				"          APC = {2024 price},",
+				"          Currency = {APC Base Currency},",
+				"          {License Types} = toString(null()),",
+				"          Imprint = toString(null()),",
+				"          Society = toString(null())) ~> derivedAPCRelatedColumns",
+				"derivedAPCRelatedColumns select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectImportColumnsFromAPC",
+				"SelectImportColumnsFromAPC sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> AllJournals"
+			]
+		}
+	}
+}

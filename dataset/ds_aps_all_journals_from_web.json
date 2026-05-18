@@ -1,0 +1,21 @@
+{
+	"name": "ds_aps_all_journals_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_aps_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/35 APS"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/ISSN-CODEN.pdf"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

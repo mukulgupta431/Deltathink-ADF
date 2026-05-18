@@ -1,0 +1,139 @@
+{
+	"name": "pl_import_MySQLTable_unpaywall_licenses_import",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "License",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "License",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "AllTimeCount",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "AllTimeCount",
+									"type": "Int64",
+									"physicalType": "bigint"
+								}
+							},
+							{
+								"source": {
+									"name": "OAness",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "OAness",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "CCness",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CCness",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Abbrev",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Abbrev",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ShortName",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ShortName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_unpaywall_licenses",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlUnpaywall_licenses",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/01_MSOpenAlex_DOI_Tidys_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-08T12:00:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

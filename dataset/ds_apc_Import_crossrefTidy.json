@@ -1,0 +1,174 @@
+{
+	"name": "ds_apc_Import_crossrefTidy",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "OADAT_dataprep_CrossRef_tidy_20250819_1313GMT+5:30.csv",
+				"folderPath": "MS_Crossref_tidy/old data",
+				"fileSystem": "general"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Idx",
+				"type": "String"
+			},
+			{
+				"name": "ISSNs_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "ISSNs_in_order",
+				"type": "String"
+			},
+			{
+				"name": "ISSN1_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "ISSNs_and_title",
+				"type": "String"
+			},
+			{
+				"name": "CWTS_ID",
+				"type": "String"
+			},
+			{
+				"name": "CWTS_ID_Last_Year",
+				"type": "String"
+			},
+			{
+				"name": "Year_wUID",
+				"type": "String"
+			},
+			{
+				"name": "Title",
+				"type": "String"
+			},
+			{
+				"name": "Source_title",
+				"type": "String"
+			},
+			{
+				"name": "Type",
+				"type": "String"
+			},
+			{
+				"name": "Print_ISSN",
+				"type": "String"
+			},
+			{
+				"name": "Electronic_ISSN",
+				"type": "String"
+			},
+			{
+				"name": "ASJC_field_IDs",
+				"type": "String"
+			},
+			{
+				"name": "Year",
+				"type": "String"
+			},
+			{
+				"name": "Citing_source",
+				"type": "String"
+			},
+			{
+				"name": "P",
+				"type": "String"
+			},
+			{
+				"name": "IPP",
+				"type": "String"
+			},
+			{
+				"name": "IPP_lower_bound_",
+				"type": "String"
+			},
+			{
+				"name": "IPP_upper_bound_",
+				"type": "String"
+			},
+			{
+				"name": "SNIP",
+				"type": "String"
+			},
+			{
+				"name": "SNIP_lower_bound_",
+				"type": "String"
+			},
+			{
+				"name": "SNIP_upper_bound_",
+				"type": "String"
+			},
+			{
+				"name": "%_self_cit",
+				"type": "String"
+			},
+			{
+				"name": "Avg_SNIP",
+				"type": "String"
+			},
+			{
+				"name": "ISSNs_count",
+				"type": "String"
+			},
+			{
+				"name": "ISSN_X",
+				"type": "String"
+			},
+			{
+				"name": "ISSN1",
+				"type": "String"
+			},
+			{
+				"name": "ISSN2",
+				"type": "String"
+			},
+			{
+				"name": "Seq",
+				"type": "String"
+			},
+			{
+				"name": "Rank",
+				"type": "String"
+			},
+			{
+				"name": "dense_rank",
+				"type": "String"
+			},
+			{
+				"name": "Quartile",
+				"type": "String"
+			},
+			{
+				"name": "Best_Quartile",
+				"type": "String"
+			},
+			{
+				"name": "Metrics_Data_Year",
+				"type": "String"
+			},
+			{
+				"name": "Model",
+				"type": "String"
+			},
+			{
+				"name": "inMarket",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

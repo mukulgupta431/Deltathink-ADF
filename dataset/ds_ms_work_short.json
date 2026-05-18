@@ -1,0 +1,53 @@
+{
+	"name": "ds_ms_work_short",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed_v1/works_short",
+				"fileSystem": "openalex"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "doi",
+				"type": "UTF8"
+			},
+			{
+				"name": "works_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "sources_id",
+				"type": "UTF8"
+			},
+			{
+				"name": "cited_by_count",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "cited_works_count",
+				"type": "DOUBLE"
+			},
+			{
+				"name": "oa_status",
+				"type": "UTF8"
+			},
+			{
+				"name": "year",
+				"type": "UTF8"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

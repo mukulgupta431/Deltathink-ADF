@@ -1,0 +1,21 @@
+{
+	"name": "ds_iopp_apc_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ioPP_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/12_IoPP"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/wp-content/uploads/2025/01/250107-2025-IOPP-APC-Price-List.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

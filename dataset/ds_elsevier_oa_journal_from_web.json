@@ -1,0 +1,21 @@
+{
+	"name": "ds_elsevier_oa_journal_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_elsevier_main_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/01_Elsevier"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "/__data/promis_misc/article-publishing-charge.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

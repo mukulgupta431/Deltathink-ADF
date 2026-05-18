@@ -1,0 +1,132 @@
+{
+	"name": "ds_ms_doi_sources",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oadat_storage_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "MarketSizing/OpenAlex"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed/sources",
+				"fileSystem": "openalex"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "sources_id",
+				"type": "String"
+			},
+			{
+				"name": "type",
+				"type": "String"
+			},
+			{
+				"name": "issn_l",
+				"type": "String"
+			},
+			{
+				"name": "issn_l_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "issns",
+				"type": "String"
+			},
+			{
+				"name": "issns_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "country_code",
+				"type": "String"
+			},
+			{
+				"name": "publisher_ID",
+				"type": "String"
+			},
+			{
+				"name": "publisher",
+				"type": "String"
+			},
+			{
+				"name": "publisher_old",
+				"type": "String"
+			},
+			{
+				"name": "publisher_lineage",
+				"type": "String"
+			},
+			{
+				"name": "display_name",
+				"type": "String"
+			},
+			{
+				"name": "name_as_stated",
+				"type": "String"
+			},
+			{
+				"name": "abbreviated_title",
+				"type": "String"
+			},
+			{
+				"name": "alternate_titles",
+				"type": "String"
+			},
+			{
+				"name": "is_oa",
+				"type": "String"
+			},
+			{
+				"name": "is_in_doaj",
+				"type": "String"
+			},
+			{
+				"name": "works_count",
+				"type": "String"
+			},
+			{
+				"name": "cited_by_count",
+				"type": "String"
+			},
+			{
+				"name": "if2y",
+				"type": "String"
+			},
+			{
+				"name": "h_index",
+				"type": "String"
+			},
+			{
+				"name": "i10_index",
+				"type": "String"
+			},
+			{
+				"name": "counts_by_year",
+				"type": "String"
+			},
+			{
+				"name": "apc_usd_doaj",
+				"type": "String"
+			},
+			{
+				"name": "updated_date",
+				"type": "String"
+			},
+			{
+				"name": "created_date",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

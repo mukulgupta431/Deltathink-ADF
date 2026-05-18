@@ -1,0 +1,21 @@
+{
+	"name": "da_sage_journal_packages_from_web",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sagepub_web",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "apc/00_web_layer/17_SAGE"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "sites/default/files/premier_2025_list_1.xlsx"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

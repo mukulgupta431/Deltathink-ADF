@@ -1,0 +1,137 @@
+{
+	"name": "14_df_ACS_processing",
+	"properties": {
+		"folder": {
+			"name": "apc/bronze to silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_ACS_bronze_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sourceAllJournal"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_ACS_bronze_all_society",
+						"type": "DatasetReference"
+					},
+					"name": "sourceSociety"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_ACS_silver_all_journals",
+						"type": "DatasetReference"
+					},
+					"name": "sinkList1AllJournal"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PreparingList1"
+				},
+				{
+					"name": "selectRequiredColumns"
+				},
+				{
+					"name": "lookupSociety"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Coden as string,",
+				"          Publication as string,",
+				"          {First Year of Publication*} as string,",
+				"          {Open Access Options? acsopenscience.org} as string,",
+				"          {Access Method for non-OA Content} as string,",
+				"          {First Year Available with a Front-File Subscription**} as string,",
+				"          URL as string,",
+				"          {Issues Per Year Online} as string,",
+				"          {Print ISSN} as string,",
+				"          {Print Svc Code} as string,",
+				"          {Web ISSN} as string,",
+				"          {Included in All Publications Package} as string,",
+				"          {Included in ACS Core Plus Package} as string,",
+				"          {Optional in Science Essentials Package} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceAllJournal",
+				"source(output(",
+				"          Coden as string,",
+				"          name as string,",
+				"          Society as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceSociety",
+				"lookupSociety derive(Publisher = 'ACS',",
+				"          ISSN1 = {Web ISSN},",
+				"          ISSN2 = iif(like({Print ISSN},'%Web Only%'),'',trim({Print ISSN})),",
+				"          Title = :Title_v,",
+				"          Source = 'Publisher Website',",
+				"          Model = :Model_v,",
+				"          {Model Notes} = toString(null()),",
+				"          APC = iif(",
+				"    :Model_v == 'Hybrid',4500,",
+				"     iif(",
+				"        :Title_v =='ACS Central Science',0,",
+				"            iif(",
+				"                :Title_v == 'ACS Omega',1935,",
+				"                3500)",
+				"        )",
+				"    )           ",
+				"/* APC is 4500 for all Hybrid Journals;",
+				"    for all open access journals except 'ACS Omega' and 'ACS Central Science' 3500 */,",
+				"          Currency = 'USD',",
+				"          {License Types} = toString(null()),",
+				"          Year = :year_v,",
+				"          PublisherID = sourceAllJournal@Coden,",
+				"          JoiningID = sourceAllJournal@Coden,",
+				"          Imprint = toString(null()),",
+				"          Society = iif(isNull(sourceSociety@Coden),",
+				"     'American Chemical Society (ACS)',",
+				"      Society),",
+				"          year_v := '2025',",
+				"          Model_v := case({Access Method for non-OA Content}==\"Open Access Only\",\"Fully OA\",'Hybrid'),",
+				"          Title_v := regexReplace(Publication, '\\\\(.*?\\\\)', '')",
+				"/* to eliminate content within paranthesis. ex-replace \"ACS ES&T Air (New in 2024)\" as \"ACS ES&T Air\" */) ~> PreparingList1",
+				"PreparingList1 select(mapColumn(",
+				"          Publisher,",
+				"          ISSN1,",
+				"          ISSN2,",
+				"          Title,",
+				"          Source,",
+				"          Model,",
+				"          {Model Notes},",
+				"          APC,",
+				"          Currency,",
+				"          {License Types},",
+				"          Year,",
+				"          PublisherID,",
+				"          JoiningID,",
+				"          Imprint,",
+				"          Society",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+				"sourceAllJournal, sourceSociety lookup(sourceAllJournal@Coden == sourceSociety@Coden,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupSociety",
+				"selectRequiredColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal"
+			]
+		}
+	}
+}

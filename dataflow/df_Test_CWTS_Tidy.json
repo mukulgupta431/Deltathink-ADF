@@ -1,0 +1,96 @@
+{
+	"name": "df_Test_CWTS_Tidy",
+	"properties": {
+		"folder": {
+			"name": "MarketSizing"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_apc_Import_cwts_tidy",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureMySqlcwtsTidyTable",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          Idx as string,",
+				"          Name_Raw as string,",
+				"          Name_Match as string,",
+				"          Name_Punct as string,",
+				"          Name_Abbrev as string,",
+				"          Name_Clean as string,",
+				"          Name_Abbrev_OLD as string,",
+				"          Source as string,",
+				"          Notes as string,",
+				"          done as string,",
+				"          bak as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Idx as long,",
+				"          ISSNs_as_stated as string,",
+				"          ISSNs_in_order as string,",
+				"          ISSN1_as_stated as string,",
+				"          ISSNs_and_title as string,",
+				"          CWTS_ID as string,",
+				"          CWTS_ID_Last_Year as string,",
+				"          Year_wUID as string,",
+				"          Title as string,",
+				"          Source_title as string,",
+				"          Type as string,",
+				"          Print_ISSN as string,",
+				"          Electronic_ISSN as string,",
+				"          ASJC_field_IDs as string,",
+				"          Year as integer,",
+				"          Citing_source as integer,",
+				"          P as integer,",
+				"          IPP as string,",
+				"          IPP_lower_bound_ as string,",
+				"          IPP_upper_bound_ as string,",
+				"          SNIP as string,",
+				"          SNIP_lower_bound_ as string,",
+				"          SNIP_upper_bound_ as string,",
+				"          {%_self_cit} as string,",
+				"          Avg_SNIP as string,",
+				"          ISSNs_count as long,",
+				"          ISSN_X as string,",
+				"          ISSN1 as string,",
+				"          ISSN2 as string,",
+				"          Seq as long,",
+				"          Rank as long,",
+				"          dense_rank as long,",
+				"          Quartile as string,",
+				"          Best_Quartile as string,",
+				"          Metrics_Data_Year as integer,",
+				"          Model as string,",
+				"          inMarket as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

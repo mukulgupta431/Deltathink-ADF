@@ -1,0 +1,199 @@
+{
+	"name": "pl_import_journalClean_Import",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Idx",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Idx",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Raw",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Raw",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Match",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Match",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Punct",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Punct",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Abbrev",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Abbrev",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Clean",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Clean",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Name_Abbrev_OLD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Name_Abbrev_OLD",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Source",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Notes",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Notes",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "done",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "done",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "bak",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "bak",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_apc_JournalNames_clean",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlJournalCleanTable",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-03-24T10:33:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

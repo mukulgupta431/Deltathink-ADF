@@ -1,0 +1,367 @@
+{
+	"name": "pl_import_MySQLTable_Bielefeld_Gold_TABLE",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy last year data to Bielefeld_Gold",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureMySqlSink",
+						"writeBatchSize": 10000,
+						"writeBatchTimeout": "00:00:30"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Idx",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Idx",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_L",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_DOAJ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_DOAJ",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_ROAD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_ROAD",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_PMC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_PMC",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_OAPC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_OAPC",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_WOS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_WOS",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_SCOPUS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_SCOPUS",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "ISSN_IN_UPW",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ISSN_IN_UPW",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_DOAJ",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_DOAJ",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_ROAD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_ROAD",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_PMC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_PMC",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_OAPC",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_OAPC",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_WOS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_WOS",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_SCOPUS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_SCOPUS",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "JOURNAL_IN_UPW",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "JOURNAL_IN_UPW",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "TITLE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "TITLE",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TITLE_SOURCE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "TITLE_SOURCE",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "auto_import_date",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "auto_import_date",
+									"type": "DateTime",
+									"physicalType": "timestamp"
+								}
+							},
+							{
+								"source": {
+									"name": "period",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "period",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "version",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DAO",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DAO",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Is_Indexed",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Is_Indexed",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_ms_Bielefeld_Gold",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureMySqlBielefeld_Gold",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "MarketSizing/01_MSOpenAlex_DOI_Tidys_StoredProcedure"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-09-19T09:11:33Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
