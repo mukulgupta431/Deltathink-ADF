@@ -2,7 +2,7 @@
 	"name": "dl-oadat-adf",
 	"properties": {
 		"trustModeClaimForMi": {
-			"value": "Enabled",
+			"value": "Disabled",
 			"editable": true
 		}
 	},
