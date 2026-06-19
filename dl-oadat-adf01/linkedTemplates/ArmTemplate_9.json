@@ -1,0 +1,1271 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_load_OpenAPC_ImportTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "apc_de.csv",
+						"folderPath": "OpenAPC/OpenAPCImport",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "institution",
+						"type": "String"
+					},
+					{
+						"name": "period",
+						"type": "String"
+					},
+					{
+						"name": "euro",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "is_hybrid",
+						"type": "String"
+					},
+					{
+						"name": "publisher",
+						"type": "String"
+					},
+					{
+						"name": "journal_full_title",
+						"type": "String"
+					},
+					{
+						"name": "issn",
+						"type": "String"
+					},
+					{
+						"name": "issn_print",
+						"type": "String"
+					},
+					{
+						"name": "issn_electronic",
+						"type": "String"
+					},
+					{
+						"name": "issn_l",
+						"type": "String"
+					},
+					{
+						"name": "license_ref",
+						"type": "String"
+					},
+					{
+						"name": "indexed_in_crossref",
+						"type": "String"
+					},
+					{
+						"name": "pmid",
+						"type": "String"
+					},
+					{
+						"name": "pmcid",
+						"type": "String"
+					},
+					{
+						"name": "ut",
+						"type": "String"
+					},
+					{
+						"name": "url",
+						"type": "String"
+					},
+					{
+						"name": "doaj",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_master_crosswalk')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Master_crosswalk_20250915_1657GMT+5:30.csv",
+						"folderPath": "master_crosswalk",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_unpaywall_licenses')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Unpaywall_Licenses_20250610_1450GMT+5_30.csv",
+						"folderPath": "Unpaywall_Licenses",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_unpaywall_sources_import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Unpaywall_Sources_import_20250610_1443GMT+5_30.csv",
+						"folderPath": "Unpaywall_Sources_import",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_unpaywall_totals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_unpaywall_totals_20250917_1917GMT+5:30.csv",
+						"folderPath": "unpaywall_totals",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_work_short')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed_v1/works_short",
+						"fileSystem": "openalex"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "doi",
+						"type": "UTF8"
+					},
+					{
+						"name": "works_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "sources_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "cited_by_count",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "cited_works_count",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "oa_status",
+						"type": "UTF8"
+					},
+					{
+						"name": "year",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openAlex_country_ships')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed_v1/country_ship",
+						"fileSystem": "openalex"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "year",
+						"type": "UTF8"
+					},
+					{
+						"name": "oa_status",
+						"type": "UTF8"
+					},
+					{
+						"name": "ISO2_Code",
+						"type": "UTF8"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					},
+					{
+						"name": "type_crossref",
+						"type": "UTF8"
+					},
+					{
+						"name": "license",
+						"type": "UTF8"
+					},
+					{
+						"name": "version",
+						"type": "UTF8"
+					},
+					{
+						"name": "host_type",
+						"type": "UTF8"
+					},
+					{
+						"name": "articles",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_all",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_first",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_corresp",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_best",
+						"type": "INT64"
+					},
+					{
+						"name": "count_all",
+						"type": "INT64"
+					},
+					{
+						"name": "count_first",
+						"type": "INT64"
+					},
+					{
+						"name": "count_corresp",
+						"type": "INT64"
+					},
+					{
+						"name": "count_best",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_per_country_all",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_first",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_corresp",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_best_guess",
+						"type": "DOUBLE"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openAlex_country_total')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed_v1/country_totals",
+						"fileSystem": "openalex"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "year",
+						"type": "UTF8"
+					},
+					{
+						"name": "oa_status",
+						"type": "UTF8"
+					},
+					{
+						"name": "ISO2_Code",
+						"type": "UTF8"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					},
+					{
+						"name": "type_crossref",
+						"type": "UTF8"
+					},
+					{
+						"name": "license",
+						"type": "UTF8"
+					},
+					{
+						"name": "version",
+						"type": "UTF8"
+					},
+					{
+						"name": "host_type",
+						"type": "UTF8"
+					},
+					{
+						"name": "articles",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_all",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_first",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_corresp",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_best",
+						"type": "INT64"
+					},
+					{
+						"name": "count_all",
+						"type": "INT64"
+					},
+					{
+						"name": "count_first",
+						"type": "INT64"
+					},
+					{
+						"name": "count_corresp",
+						"type": "INT64"
+					},
+					{
+						"name": "count_best",
+						"type": "INT64"
+					},
+					{
+						"name": "articles_per_country_all",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_first",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_corresp",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "articles_per_country_best_guess",
+						"type": "DOUBLE"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openAlex_funder_import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-578adb88-c15b-44f2-bb9d-a6b569227101-c000.csv",
+						"folderPath": "processed_v1/funders_csv",
+						"fileSystem": "openalex"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "funders_id",
+						"type": "String"
+					},
+					{
+						"name": "openalex_id",
+						"type": "String"
+					},
+					{
+						"name": "ror_id",
+						"type": "String"
+					},
+					{
+						"name": "crossref_id",
+						"type": "String"
+					},
+					{
+						"name": "other_ids_json",
+						"type": "String"
+					},
+					{
+						"name": "roles",
+						"type": "String"
+					},
+					{
+						"name": "country_code",
+						"type": "String"
+					},
+					{
+						"name": "grants_count",
+						"type": "String"
+					},
+					{
+						"name": "display_name",
+						"type": "String"
+					},
+					{
+						"name": "name_as_stated",
+						"type": "String"
+					},
+					{
+						"name": "alternate_titles",
+						"type": "String"
+					},
+					{
+						"name": "works_count",
+						"type": "String"
+					},
+					{
+						"name": "cited_by_count",
+						"type": "String"
+					},
+					{
+						"name": "if2y",
+						"type": "String"
+					},
+					{
+						"name": "h_index",
+						"type": "String"
+					},
+					{
+						"name": "i10_index",
+						"type": "String"
+					},
+					{
+						"name": "counts_by_year",
+						"type": "String"
+					},
+					{
+						"name": "updated_date",
+						"type": "String"
+					},
+					{
+						"name": "created_date",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openAlex_topics_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part_000.gz",
+						"folderPath": "topics/updated_date=2025-07-07",
+						"fileSystem": "openalex"
+					},
+					"compression": {
+						"type": "gzip"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openAlex_works_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed/works",
+						"fileSystem": "openalex"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_openaAlex_works_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "openAlex"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "raw/data/works",
+						"fileSystem": "openalex"
+					},
+					"compression": {
+						"type": "gzip"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_optic_bronze_journal')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/22 Optic"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Optic_journals.json",
+						"folderPath": "bronze/Optica (OSA)/all",
+						"fileSystem": "apc"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"journals": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string"
+									},
+									"title_url": {
+										"type": "string"
+									},
+									"ISSN": {
+										"type": "null"
+									},
+									"eISSN": {
+										"type": "string"
+									},
+									"CODEN": {
+										"type": "string"
+									},
+									"open_access": {
+										"type": "boolean"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_optic_price')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/22 Optic"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "optic_apc.csv",
+						"folderPath": "bronze/Optica (OSA)/price",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "code",
+						"type": "String"
+					},
+					{
+						"name": "title",
+						"type": "String"
+					},
+					{
+						"name": "APC",
+						"type": "String"
+					},
+					{
+						"name": "currency",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_optic_silver_all')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/Misc/22 Optic"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Optica (OSA)/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_oup_kbart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/24_OUP"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/OUP/kbart",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "publication_title",
+						"type": "String"
+					},
+					{
+						"name": "print_identifier",
+						"type": "String"
+					},
+					{
+						"name": "online_identifier",
+						"type": "String"
+					},
+					{
+						"name": "date_first_issue_online",
+						"type": "String"
+					},
+					{
+						"name": "num_first_vol_online",
+						"type": "String"
+					},
+					{
+						"name": "num_first_issue_online",
+						"type": "String"
+					},
+					{
+						"name": "date_last_issue_online",
+						"type": "String"
+					},
+					{
+						"name": "num_last_vol_online",
+						"type": "String"
+					},
+					{
+						"name": "num_last_issue_online",
+						"type": "String"
+					},
+					{
+						"name": "title_url",
+						"type": "String"
+					},
+					{
+						"name": "first_author",
+						"type": "String"
+					},
+					{
+						"name": "title_id",
+						"type": "String"
+					},
+					{
+						"name": "embargo_info",
+						"type": "String"
+					},
+					{
+						"name": "coverage_depth",
+						"type": "String"
+					},
+					{
+						"name": "notes",
+						"type": "String"
+					},
+					{
+						"name": "publisher_name",
+						"type": "String"
+					},
+					{
+						"name": "publication_type",
+						"type": "String"
+					},
+					{
+						"name": "date_monograph_published_print",
+						"type": "String"
+					},
+					{
+						"name": "date_monograph_published_online",
+						"type": "String"
+					},
+					{
+						"name": "monograph_volume",
+						"type": "String"
+					},
+					{
+						"name": "monograph_edition",
+						"type": "String"
+					},
+					{
+						"name": "first_editor",
+						"type": "String"
+					},
+					{
+						"name": "parent_publication_title_id",
+						"type": "String"
+					},
+					{
+						"name": "preceding_publication_title_id",
+						"type": "String"
+					},
+					{
+						"name": "access_type",
+						"type": "String"
+					},
+					{
+						"name": "OCN",
+						"type": "String"
+					},
+					{
+						"name": "_c26",
+						"type": "String"
+					},
+					{
+						"name": "MARC Control Number",
+						"type": "String"
+					},
+					{
+						"name": "Subject",
+						"type": "String"
+					},
+					{
+						"name": "Collections",
+						"type": "String"
+					},
+					{
+						"name": "Year Started at OUP",
+						"type": "String"
+					},
+					{
+						"name": "Title History",
+						"type": "String"
+					},
+					{
+						"name": "Current Title",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_oup_price_list')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/24_OUP"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/OUP/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Journal",
+						"type": "String"
+					},
+					{
+						"name": "CC-BY",
+						"type": "String"
+					},
+					{
+						"name": "CC BY-NC",
+						"type": "String"
+					},
+					{
+						"name": "CC BY-NC-ND",
+						"type": "String"
+					},
+					{
+						"name": "See Non-standard tab?",
+						"type": "String"
+					},
+					{
+						"name": "APC Base Currency",
+						"type": "String"
+					},
+					{
+						"name": "2024 price",
+						"type": "String"
+					},
+					{
+						"name": "Member discount",
+						"type": "String"
+					},
+					{
+						"name": "ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Journal Type",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_oup_silver_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/24_OUP"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/OUP/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sage_bronze_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/17_sage"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/SAGE/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Coden",
+						"type": "String"
+					},
+					{
+						"name": "Publication",
+						"type": "String"
+					},
+					{
+						"name": "First Year of Publication*",
+						"type": "String"
+					},
+					{
+						"name": "Open Access Options? acsopenscience.org",
+						"type": "String"
+					},
+					{
+						"name": "Access Method for non-OA Content",
+						"type": "String"
+					},
+					{
+						"name": "First Year Available with a Front-File Subscription**",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "Issues Per Year Online",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Svc Code",
+						"type": "String"
+					},
+					{
+						"name": "Web ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Included in All Publications Package",
+						"type": "String"
+					},
+					{
+						"name": "Included in ACS Core Plus Package",
+						"type": "String"
+					},
+					{
+						"name": "Optional in Science Essentials Package",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sage_bronze_goldOAPriceList')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/17_sage"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/SAGE/gold-oa-pricelist",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Coden",
+						"type": "String"
+					},
+					{
+						"name": "Publication",
+						"type": "String"
+					},
+					{
+						"name": "First Year of Publication*",
+						"type": "String"
+					},
+					{
+						"name": "Open Access Options? acsopenscience.org",
+						"type": "String"
+					},
+					{
+						"name": "Access Method for non-OA Content",
+						"type": "String"
+					},
+					{
+						"name": "First Year Available with a Front-File Subscription**",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "Issues Per Year Online",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Svc Code",
+						"type": "String"
+					},
+					{
+						"name": "Web ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Included in All Publications Package",
+						"type": "String"
+					},
+					{
+						"name": "Included in ACS Core Plus Package",
+						"type": "String"
+					},
+					{
+						"name": "Optional in Science Essentials Package",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		}
+	]
+}

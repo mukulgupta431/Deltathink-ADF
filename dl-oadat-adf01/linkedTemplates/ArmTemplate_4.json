@@ -1,0 +1,859 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_IEEE_silver_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/20_IEEE"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/IEEE/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_Medknow_bronze_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/06_Medknow"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Medknow/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Coden",
+						"type": "String"
+					},
+					{
+						"name": "Publication",
+						"type": "String"
+					},
+					{
+						"name": "First Year of Publication*",
+						"type": "String"
+					},
+					{
+						"name": "Open Access Options? acsopenscience.org",
+						"type": "String"
+					},
+					{
+						"name": "Access Method for non-OA Content",
+						"type": "String"
+					},
+					{
+						"name": "First Year Available with a Front-File Subscription**",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "Issues Per Year Online",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Svc Code",
+						"type": "String"
+					},
+					{
+						"name": "Web ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Included in All Publications Package",
+						"type": "String"
+					},
+					{
+						"name": "Included in ACS Core Plus Package",
+						"type": "String"
+					},
+					{
+						"name": "Optional in Science Essentials Package",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_Medknow_silver_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/06_Medknow"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Medknow/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Coden",
+						"type": "String"
+					},
+					{
+						"name": "Publication",
+						"type": "String"
+					},
+					{
+						"name": "First Year of Publication*",
+						"type": "String"
+					},
+					{
+						"name": "Open Access Options? acsopenscience.org",
+						"type": "String"
+					},
+					{
+						"name": "Access Method for non-OA Content",
+						"type": "String"
+					},
+					{
+						"name": "First Year Available with a Front-File Subscription**",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "Issues Per Year Online",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Svc Code",
+						"type": "String"
+					},
+					{
+						"name": "Web ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Included in All Publications Package",
+						"type": "String"
+					},
+					{
+						"name": "Included in ACS Core Plus Package",
+						"type": "String"
+					},
+					{
+						"name": "Optional in Science Essentials Package",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_SpringNature_oa_journal_from_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_SpringerNature_web",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/01_SpringerNature"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "springer-cms/rest/v1/content/26206380/data/v15"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_SpringerNature_all_Journal_from_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_SpringerNature_web",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/01_SpringerNature"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "springer-cms/rest/v1/content/27651780/data/v5"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_SpringerNature_oa_journal')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/01_SpringerNature"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "oa_pdf",
+						"folderPath": "bronze/springerNature/import",
+						"fileSystem": "apc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_Test_StoredProc')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "dummySP",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "APC_ID",
+						"type": "String"
+					},
+					{
+						"name": "ISSN_L",
+						"type": "String"
+					},
+					{
+						"name": "Title_ID",
+						"type": "String"
+					},
+					{
+						"name": "Source_title",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "Publisher_Short",
+						"type": "String"
+					},
+					{
+						"name": "Publisher_Short_OA",
+						"type": "String"
+					},
+					{
+						"name": "Year",
+						"type": "String"
+					},
+					{
+						"name": "Model",
+						"type": "String"
+					},
+					{
+						"name": "APC",
+						"type": "String"
+					},
+					{
+						"name": "Source_title_history",
+						"type": "String"
+					},
+					{
+						"name": "Title_history",
+						"type": "String"
+					},
+					{
+						"name": "Publisher_history",
+						"type": "String"
+					},
+					{
+						"name": "Publisher_history_OA",
+						"type": "String"
+					},
+					{
+						"name": "Year_history",
+						"type": "String"
+					},
+					{
+						"name": "ID_history",
+						"type": "String"
+					},
+					{
+						"name": "wUID",
+						"type": "String"
+					},
+					{
+						"name": "Contiguous",
+						"type": "String"
+					},
+					{
+						"name": "Updates",
+						"type": "String"
+					},
+					{
+						"name": "Child_records",
+						"type": "String"
+					},
+					{
+						"name": "Change_publisher",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_Thieme_bronze_all')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/Thieme"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Thieme/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_bronze_ReplaceTitles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/FindAndReplaceTitles",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": null
+				},
+				"schema": [
+					{
+						"name": "publication_title\tprint_identifier\tonline_identifier\tdate_first_issue_online\tnum_first_vol_online\tnum_first_issue_online\tdate_last_issue_online\tnum_last_vol_online\tnum_last_issue_online\ttitle_url\tfirst_author\ttitle_id\tembargo_info\tcoverage_depth\tnotes\tpublisher_name\tpublication_type\tdate_monograph_published_print\tdate_monograph_published_online\tmonograph_volume\tmonograph_edition\tfirst_editor\tparent_publication_title_id\tpreceding_publication_title_id\taccess_type\tsupplement\ttitle_change_history",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_bronze_hybrid_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/hybrid",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Full Title",
+						"type": "String"
+					},
+					{
+						"name": "ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Unformatted ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Product ID",
+						"type": "String"
+					},
+					{
+						"name": "Change History",
+						"type": "String"
+					},
+					{
+						"name": "Shortcut URL",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_bronze_kbart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/kbart",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": null
+				},
+				"schema": [
+					{
+						"name": "publication_title\tprint_identifier\tonline_identifier\tdate_first_issue_online\tnum_first_vol_online\tnum_first_issue_online\tdate_last_issue_online\tnum_last_vol_online\tnum_last_issue_online\ttitle_url\tfirst_author\ttitle_id\tembargo_info\tcoverage_depth\tnotes\tpublisher_name\tpublication_type\tdate_monograph_published_print\tdate_monograph_published_online\tmonograph_volume\tmonograph_edition\tfirst_editor\tparent_publication_title_id\tpreceding_publication_title_id\taccess_type\tsupplement\ttitle_change_history",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_bronze_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "Business model",
+						"type": "String"
+					},
+					{
+						"name": "USD",
+						"type": "String"
+					},
+					{
+						"name": "EUR",
+						"type": "String"
+					},
+					{
+						"name": "GBP",
+						"type": "String"
+					},
+					{
+						"name": "JPY",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_bronze_societyTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/society",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Abbreviation",
+						"type": "String"
+					},
+					{
+						"name": "Full name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_silver_TEST')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Wolters Kluwer Health/TEST",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_silver_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Wolters Kluwer Health/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_silver_both_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Wolters Kluwer Health/both",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_WoltersKluwerHealth_silver_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/05_WoltersKluwerHealth"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Wolters Kluwer Health/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_acm_kbart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/33_ACM"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "kbart.txt",
+						"folderPath": "bronze/Association for Computing Machinery (ACM)/kbart",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "publication_title\tprint_identifier\tonline_identifier\tdate_first_issue_online\tnum_first_vol_online\tnum_first_issue_online\tdate_last_issue_online\tnum_last_vol_online\tnum_last_issue_online\ttitle_url\tfirst_author\ttitle_id\tembargo_info\tcoverage_depth\tnotes\tpublisher_name\tpublication_type\tdate_monograph_published_print\tdate_monograph_published_online\tmonograph_volume\tmonograph_edition\tfirst_editor\tparent_publication_title_id\tpreceding_publication_title_id\taccess_type",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_acm_kbart_from_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_acm_web",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/33_ACM"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "/pb-assets/feeds/acm_kbart_periodicals_proceedings.txt"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_apa_kbart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/APA"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "kbart.csv",
+						"folderPath": "bronze/American Psychological Association (APA)/kbart",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": "\t",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		}
+	]
+}

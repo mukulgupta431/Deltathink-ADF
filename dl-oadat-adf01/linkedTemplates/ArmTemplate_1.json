@@ -1,0 +1,1446 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		},
+		"ls_odat_storage_gen2_v1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_odat_storage_gen2_v1'"
+		},
+		"ls_openalex_secretAccessKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'secretAccessKey' of 'ls_openalex'"
+		},
+		"ls_odat_storage_gen2_v1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dloadatdl.dfs.core.windows.net/"
+		},
+		"ls_open_ieee_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://open.ieee.org"
+		},
+		"ls_openalex_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "t"
+		},
+		"ls_oup_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://fdslive.oup.com"
+		},
+		"ls_sagepub_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://us.sagepub.com/"
+		},
+		"ls_thieme_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cdn0.scrvt.com/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_odat_storage_gen2_v1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_odat_storage_gen2_v1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_odat_storage_gen2_v1_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_open_ieee_web')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_open_ieee_web_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_openalex')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AmazonS3",
+				"typeProperties": {
+					"serviceUrl": "https://openalex.s3.amazonaws.com/",
+					"accessKeyId": "[parameters('ls_openalex_properties_typeProperties_accessKeyId')]",
+					"secretAccessKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_openalex_secretAccessKey')]"
+					},
+					"authenticationType": "AccessKey"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_oup_web_asset')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_oup_web_asset_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_sagepub_web')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_sagepub_web_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_thieme_web_asset')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_thieme_web_asset_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/iropenalex')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false,
+							"customProperties": []
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map_Flowlet')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "select2"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "input1"
+						},
+						{
+							"name": "input2"
+						},
+						{
+							"name": "outputAPCTidyISSNLs"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> input1",
+						"input(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     order: 1,",
+						"     allowSchemaDrift: true) ~> input2",
+						"input1 select(mapColumn(",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"input1 derive(ISSN_L_via = toString(null())) ~> derivedColumn1",
+						"derivedColumn1 output() ~> outputAPCTidyISSNLs"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map_Flowlet_New')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "APCTidyISSNLs"
+						},
+						{
+							"name": "filter3"
+						},
+						{
+							"name": "derivedMissingTable"
+						},
+						{
+							"name": "filter4"
+						},
+						{
+							"name": "selectwUID"
+						},
+						{
+							"name": "lookup3"
+						},
+						{
+							"name": "lookup4"
+						},
+						{
+							"name": "derivedViawUID"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "input1"
+						},
+						{
+							"name": "input2"
+						},
+						{
+							"name": "outputAPCTidyISSNLs"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string,",
+						"          {source2@ISSN_L} as string",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> input1",
+						"input(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     order: 1,",
+						"     allowSchemaDrift: true) ~> input2",
+						"derivedColumn1 select(mapColumn(",
+						"          wUID,",
+						"          ISSN = ISSN1,",
+						"          ISSN_L = {source2@ISSN_L},",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1, input1 union(byName: true)~> union1",
+						"union1 select(mapColumn(",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> APCTidyISSNLs",
+						"derivedMissingTable filter(not(isNull(ISSN_L))) ~> filter3",
+						"lookup3 derive(wUID = union1@wUID,",
+						"          ISSN_L = iif(not(isNull(ISSN_L)),ISSN_L,toString(null()))) ~> derivedMissingTable",
+						"union1 filter(isNull(ISSN_L)) ~> filter4",
+						"filter4 select(mapColumn(",
+						"          wUID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectwUID",
+						"union1, selectwUID lookup(union1@wUID == selectwUID@wUID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup3",
+						"APCTidyISSNLs, derivedMissingTable lookup(APCTidyISSNLs@wUID == derivedMissingTable@wUID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup4",
+						"lookup4 derive(ISSN_L = :missing_ISSN_L_v,",
+						"          ISSN_L_via = iif(not(isNull(:missing_ISSN_L_v)),'wUID',toString(null())),",
+						"          missing_ISSN_L_v := iif(isNull(APCTidyISSNLs@ISSN_L),derivedMissingTable@ISSN_L,APCTidyISSNLs@ISSN_L)) ~> derivedViawUID",
+						"input1 derive(ISSN_L_via = toString(null())) ~> derivedColumn1",
+						"derivedViawUID select(mapColumn(",
+						"          wUID = APCTidyISSNLs@wUID,",
+						"          ISSN = APCTidyISSNLs@ISSN,",
+						"          ISSN_L,",
+						"          Title = APCTidyISSNLs@Title,",
+						"          Source_title = APCTidyISSNLs@Source_title,",
+						"          Publisher = APCTidyISSNLs@Publisher,",
+						"          PublisherID = APCTidyISSNLs@PublisherID,",
+						"          ISSN_L_via,",
+						"          wUID = derivedMissingTable@wUID,",
+						"          ISSN = union1@ISSN,",
+						"          Title = union1@Title,",
+						"          Source_title = union1@Source_title,",
+						"          Publisher = union1@Publisher,",
+						"          PublisherID = union1@PublisherID,",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2 output() ~> outputAPCTidyISSNLs"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map_Flowlet_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Flowlet",
+				"typeProperties": {
+					"sources": [],
+					"sinks": [],
+					"transformations": [
+						{
+							"name": "select2"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "input1"
+						},
+						{
+							"name": "input2"
+						},
+						{
+							"name": "outputAPCTidyISSNLs"
+						}
+					],
+					"scriptLines": [
+						"input(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     order: 0,",
+						"     allowSchemaDrift: true) ~> input1",
+						"input(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     order: 1,",
+						"     allowSchemaDrift: true) ~> input2",
+						"input1 select(mapColumn(",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"input1 derive(ISSN_L_via = toString(null())) ~> derivedColumn1",
+						"derivedColumn1 output() ~> outputAPCTidyISSNLs"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/03_AMA_Silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "AMA Silver Composer",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "03_AMA_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Minor"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-12-01T13:34:36Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/03_TnF')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Silver Composer",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "03_TnF_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Major"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-21T11:39:00Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/09_MDPI_Silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Populate MDPI Silver",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "08_MDPI_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Major"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-21T13:03:22Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/33_pl_populate_acm_silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ACM_Silver_Composer",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "ACM_Association for Computing Machinery_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/apc/bronze to silver"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-01-28T00:10:27Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySQLCrossRef_Import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/MySQLTables_DS"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Crossref_ID",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Publisher",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "pissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "eissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "additionalIssns",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "doi",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "issue_info",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "DAO",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "CleanedTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "AbbrevTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "crossref_import"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySQLCrossRef_Tidy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/MySQLTables_DS"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Crossref_ID",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Publisher",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "pissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "eissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "additionalIssns",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "doi",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "issue_info",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "DAO",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "CleanedTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "AbbrevTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "crossref_tidy"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySQLSocietyTitleRaw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/MySQLTables_DS"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Crossref_ID",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Publisher",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "pissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "eissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "additionalIssns",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "doi",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "issue_info",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "DAO",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "CleanedTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "AbbrevTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "society_titles_raw"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySqlAPC_TIDY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/MySQLTables_DS"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "Idx",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Raw",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Match",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Punct",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Abbrev",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Clean",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Abbrev_OLD",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Source",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Notes",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "done",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bak",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "apc_tidy"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySqlBielefeld_Gold')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/MySQLTables_DS"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "Idx",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Raw",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Match",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Punct",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Abbrev",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Clean",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Name_Abbrev_OLD",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Source",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Notes",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "done",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "bak",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "bielefeld_gold"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureMySqlCrossRefTidyTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureMySql1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureMySqlTable",
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Crossref_ID",
+						"type": "int",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "Publisher",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "pissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "eissn",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "additionalIssns",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "doi",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "issue_info",
+						"type": "text",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "DAO",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "CleanedTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					},
+					{
+						"name": "AbbrevTitle",
+						"type": "varchar",
+						"precision": 0,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"tableName": "crossref_tidy"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

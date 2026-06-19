@@ -1,0 +1,108 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "dl-oadat-adf01"
+		},
+		"AmazonS31_secretAccessKey": {
+			"value": ""
+		},
+		"AzureMySql1_connectionString": {
+			"value": ""
+		},
+		"ls_oadat_storage_gen2_accountKey": {
+			"value": ""
+		},
+		"ls_odat_storage_gen2_v1_accountKey": {
+			"value": ""
+		},
+		"ls_openalex_secretAccessKey": {
+			"value": ""
+		},
+		"AmazonS31_properties_typeProperties_accessKeyId": {
+			"value": "dummy"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "oadat-workspace.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "master"
+		},
+		"MS_CrossRef_properties_typeProperties_url": {
+			"value": "http://ftp.crossref.org/titlelist/titleFile.csv"
+		},
+		"dl_oadat_AzureSynapseArtifacts_properties_typeProperties_endpoint": {
+			"value": "https://oadat-workspace.dev.azuresynapse.net"
+		},
+		"ls_AIP_Kbart_properties_typeProperties_url": {
+			"value": "https://publishing.aip.org/kbart_aip_journals/"
+		},
+		"ls_IEEE_org_web_properties_typeProperties_url": {
+			"value": "https://ieeexplore.ieee.org"
+		},
+		"ls_SpringerNature_web_properties_typeProperties_url": {
+			"value": "https://resource-cms.springernature.com/"
+		},
+		"ls_acm_web_properties_typeProperties_url": {
+			"value": "https://dl.acm.org"
+		},
+		"ls_apa_web_asset_properties_typeProperties_url": {
+			"value": "https://supp.apa.org"
+		},
+		"ls_aps_web_properties_typeProperties_url": {
+			"value": "https://librarians.aps.org"
+		},
+		"ls_asme_web_asset_properties_typeProperties_url": {
+			"value": "https://asmedigitalcollection.asme.org"
+		},
+		"ls_cup_web_asset_properties_typeProperties_url": {
+			"value": "https://assets.ctfassets.net"
+		},
+		"ls_degruyter_web_asset_properties_typeProperties_url": {
+			"value": "https://degruyter-live-craftcms-assets.s3.amazonaws.com"
+		},
+		"ls_elsevier_legacyfileshare_web_properties_typeProperties_url": {
+			"value": "https://legacyfileshare.elsevier.com"
+		},
+		"ls_elsevier_main_web_properties_typeProperties_url": {
+			"value": "https://www.elsevier.com"
+		},
+		"ls_emerald_web_asset_properties_typeProperties_url": {
+			"value": "https://www.emeraldgrouppublishing.com"
+		},
+		"ls_ioPP_web_properties_typeProperties_url": {
+			"value": "https://publishingsupport.iopscience.iop.org"
+		},
+		"ls_mayy_ann_web_properties_typeProperties_url": {
+			"value": "https://home.liebertpub.com/librarians/spreadsheet"
+		},
+		"ls_oadat_storage_gen2_properties_typeProperties_url": {
+			"value": "https://dloadatdl.dfs.core.windows.net/"
+		},
+		"ls_odat_storage_gen2_v1_properties_typeProperties_url": {
+			"value": "https://dloadatdl.dfs.core.windows.net/"
+		},
+		"ls_open_ieee_web_properties_typeProperties_url": {
+			"value": "https://open.ieee.org"
+		},
+		"ls_openalex_properties_typeProperties_accessKeyId": {
+			"value": "t"
+		},
+		"ls_oup_web_asset_properties_typeProperties_url": {
+			"value": "https://fdslive.oup.com"
+		},
+		"ls_sagepub_web_properties_typeProperties_url": {
+			"value": "https://us.sagepub.com/"
+		},
+		"ls_thieme_web_asset_properties_typeProperties_url": {
+			"value": "https://cdn0.scrvt.com/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

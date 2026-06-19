@@ -1,0 +1,1575 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_thieme_all_journals_from_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_thieme_web_asset",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/Thieme"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "/9ca5761af4a1cf7bf49dd51537e8f4d1/808a140c43f05a0b/133ede67be09/Jan07_APC-list-price-for-2025.xlsx"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_bronze_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/wiley/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Journal Group code (numeric)",
+						"type": "String"
+					},
+					{
+						"name": "Journal Group code (alpha)",
+						"type": "String"
+					},
+					{
+						"name": "MJ code",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Journal Code",
+						"type": "String"
+					},
+					{
+						"name": "Digital ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Digital Journal Code",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "Print Material Number",
+						"type": "String"
+					},
+					{
+						"name": "Print Status",
+						"type": "String"
+					},
+					{
+						"name": "Digital Material Number",
+						"type": "String"
+					},
+					{
+						"name": "Digital Status",
+						"type": "String"
+					},
+					{
+						"name": "MultiMedia SAP Material",
+						"type": "String"
+					},
+					{
+						"name": "FTE Price Model",
+						"type": "String"
+					},
+					{
+						"name": "DOI",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "General Subject Category",
+						"type": "String"
+					},
+					{
+						"name": "Primary Subject Area",
+						"type": "String"
+					},
+					{
+						"name": "Media Type",
+						"type": "String"
+					},
+					{
+						"name": "External notes PRICING",
+						"type": "String"
+					},
+					{
+						"name": "Hybrid Open Access",
+						"type": "String"
+					},
+					{
+						"name": "Available For POD",
+						"type": "String"
+					},
+					{
+						"name": "Included In Database",
+						"type": "String"
+					},
+					{
+						"name": "Full Collection",
+						"type": "String"
+					},
+					{
+						"name": "STM Collection",
+						"type": "String"
+					},
+					{
+						"name": "SSH Collection",
+						"type": "String"
+					},
+					{
+						"name": "M&N Collection",
+						"type": "String"
+					},
+					{
+						"name": "Not in any Standard Collections",
+						"type": "String"
+					},
+					{
+						"name": "R4L Collection",
+						"type": "String"
+					},
+					{
+						"name": "Current Year Volume",
+						"type": "String"
+					},
+					{
+						"name": "Current Year Issue",
+						"type": "String"
+					},
+					{
+						"name": "Frontfile Start Year",
+						"type": "String"
+					},
+					{
+						"name": "Frontfile Start Volume",
+						"type": "String"
+					},
+					{
+						"name": "Year of First Backfile Volume",
+						"type": "String"
+					},
+					{
+						"name": "First Backfile Volume Available",
+						"type": "String"
+					},
+					{
+						"name": "First Backfile Isssue Available",
+						"type": "String"
+					},
+					{
+						"name": "Year of Last Backfile Volume",
+						"type": "String"
+					},
+					{
+						"name": "Last Backfile Volume Available",
+						"type": "String"
+					},
+					{
+						"name": "Last Backfile Issue Available",
+						"type": "String"
+					},
+					{
+						"name": "Renewal Subscription Type",
+						"type": "String"
+					},
+					{
+						"name": "Journal Owned by",
+						"type": "String"
+					},
+					{
+						"name": "Impact Factor 2023",
+						"type": "String"
+					},
+					{
+						"name": "clean_title",
+						"type": "String"
+					},
+					{
+						"name": "issnl",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_bronze_freeoa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/wiley/freeoa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Journal Group code",
+						"type": "String"
+					},
+					{
+						"name": "Print ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Print Journal Code",
+						"type": "String"
+					},
+					{
+						"name": "Digital ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Digital Journal Code",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "Print Material Number",
+						"type": "String"
+					},
+					{
+						"name": "Print Status",
+						"type": "String"
+					},
+					{
+						"name": "Digital Material Number",
+						"type": "String"
+					},
+					{
+						"name": "Digital Status",
+						"type": "String"
+					},
+					{
+						"name": "MultiMedia SAP Material",
+						"type": "String"
+					},
+					{
+						"name": "FTE Price Model",
+						"type": "String"
+					},
+					{
+						"name": "DOI",
+						"type": "String"
+					},
+					{
+						"name": "URL",
+						"type": "String"
+					},
+					{
+						"name": "Renewal Subscription Type",
+						"type": "String"
+					},
+					{
+						"name": "Journal Owned by",
+						"type": "String"
+					},
+					{
+						"name": "General Subject Category",
+						"type": "String"
+					},
+					{
+						"name": "Primary Subject Area",
+						"type": "String"
+					},
+					{
+						"name": "Impact Factor 2022",
+						"type": "String"
+					},
+					{
+						"name": "clean_title",
+						"type": "String"
+					},
+					{
+						"name": "issnl",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_bronze_hybrid')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/wiley/hybrid",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Journal Title",
+						"type": "String"
+					},
+					{
+						"name": "Online ISSN",
+						"type": "String"
+					},
+					{
+						"name": "Subject Area",
+						"type": "String"
+					},
+					{
+						"name": "License Types Offered",
+						"type": "String"
+					},
+					{
+						"name": "USD",
+						"type": "String"
+					},
+					{
+						"name": "GBP",
+						"type": "String"
+					},
+					{
+						"name": "EUR",
+						"type": "String"
+					},
+					{
+						"name": "clean_title",
+						"type": "String"
+					},
+					{
+						"name": "issnl",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_bronze_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/wiley/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Journal Name",
+						"type": "String"
+					},
+					{
+						"name": "Subject Area",
+						"type": "String"
+					},
+					{
+						"name": "Online ISSN",
+						"type": "String"
+					},
+					{
+						"name": "License Types Offered",
+						"type": "String"
+					},
+					{
+						"name": "USD",
+						"type": "String"
+					},
+					{
+						"name": "GBP",
+						"type": "String"
+					},
+					{
+						"name": "EUR",
+						"type": "String"
+					},
+					{
+						"name": "clean_title",
+						"type": "String"
+					},
+					{
+						"name": "issnl",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_silver_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/wiley/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_wiley_silver_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/04_wiley"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/wiley/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_Thieme_silver_all_journal')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/Misc/Thieme"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Thieme/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "PubType",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "OnlineUrl",
+						"type": "String"
+					},
+					{
+						"name": "OnlineYear",
+						"type": "String"
+					},
+					{
+						"name": "FirstVolume",
+						"type": "String"
+					},
+					{
+						"name": "OnlineCode",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_aip_kbart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/13_AIP"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "kbart.xlsx",
+						"folderPath": "bronze/American Institute of Physics (AIP)/import",
+						"fileSystem": "apc"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_aip_kbart_from_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_AIP_Kbart",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/00_web_layer/13_AIP"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_marry_ann__silver_all_journal')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/Misc/18_Mary Ann Liebert"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/Mary Ann Liebert/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "PubType",
+						"type": "String"
+					},
+					{
+						"name": "Title",
+						"type": "String"
+					},
+					{
+						"name": "OnlineUrl",
+						"type": "String"
+					},
+					{
+						"name": "OnlineYear",
+						"type": "String"
+					},
+					{
+						"name": "FirstVolume",
+						"type": "String"
+					},
+					{
+						"name": "OnlineCode",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/02_AIPP_Siver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Kbart Data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ls_aip_kbart_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ls_aip_kbart",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "convert kbart excel to csv",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy Kbart Data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "02_AIP_Bronze_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Generate Silver data",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "convert kbart excel to csv",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "02_AIP_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Minor"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-12-01T11:31:36Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ls_aip_kbart_from_web')]",
+				"[concat(variables('factoryId'), '/datasets/ls_aip_kbart')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/08_ACM_Silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy ACM Kbart",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_acm_kbart_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_acm_kbart",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate ACM Siver Data",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy ACM Kbart",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "08_ACM_Association for Computing Machinery_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Minor"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-01-09T09:39:30Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/25_Cambridge University Press')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Populate CUP Silver data",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy CUP Price List",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "25_CUP_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Copy CUP Price List",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_cup_priceListFrom_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_cup_priceList",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Major"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-20T15:41:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/35_APS_Silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy APS Journal",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_aps_all_journals_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_aps_all_journal",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Populate Siver data",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy APS Journal",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "35_APC_Silver_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-25T05:41:24Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Thieme_silver_processor')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_thieme_all_journals_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_thieme_all_journals",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Minor"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-01-18T21:23:22Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_thieme_all_journals_from_web')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_APCImport1_mysql')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"query": "call oadat_dataprep.callFromADF();\n",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureMySqlTableApcImport1",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_Test_StoredProc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-24T10:33:41Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_APCImport1_mysqlCrosswalk')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"query": "call oadat_dataprep. APC_Import_Crosswalk();\n\n",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureMySqlIssnToIsslLTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_Test_StoredProc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-08-06T13:20:17Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_APCImport1_mysqlMap')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"query": "call oadat_dataprep. APC_Import_Map();\n\n",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureMySqlIssnToIsslLTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_Test_StoredProc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-24T10:33:41Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_APCImport1_mysqlMasterList')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureMySqlSource",
+								"query": "call oadat_dataprep. APC_Import_MasterList();\n\n",
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "AzureMySqlIssnToIsslLTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_Test_StoredProc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/apc/silver to gold/APC_Import_Mysql"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-03-24T10:33:41Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

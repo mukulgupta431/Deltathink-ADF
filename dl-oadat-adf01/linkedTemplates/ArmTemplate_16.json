@@ -1,0 +1,4449 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImportMasterListBckup')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCMasterList"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidy"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "APCMostRecents"
+						},
+						{
+							"name": "JoinMostRecentMetadata"
+						},
+						{
+							"name": "CheckExistingTitles"
+						},
+						{
+							"name": "SplitNewAndExisting"
+						},
+						{
+							"name": "NewRecordsProcessing"
+						},
+						{
+							"name": "UpdateExistingRecords"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as short,",
+						"          ISSN_L as string,",
+						"          Title_ID as integer,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as short,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as integer,",
+						"          Contiguous as boolean,",
+						"          Updates as short,",
+						"          Child_records as short,",
+						"          Change_publisher as boolean",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+						"source(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+						"sourceAPCTidy filter(not(isNull(ISSN_L))) ~> filter1",
+						"filter1 aggregate(groupBy(ISSN_L),",
+						"     Year = max(Year)) ~> APCMostRecents",
+						"APCMostRecents, sourceAPCTidy join(APCMostRecents@ISSN_L == sourceAPCTidy@ISSN_L",
+						"     && APCMostRecents@Year == sourceAPCTidy@Year,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> JoinMostRecentMetadata",
+						"select2, sourceAPCTitles lookup(TidyISSN_L == ISSN_L,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> CheckExistingTitles",
+						"select1 split(isNull(ISSN_L),",
+						"     disjoint: false) ~> SplitNewAndExisting@(NewRecords, ExistingRecords)",
+						"SplitNewAndExisting@NewRecords derive(Updates = 0) ~> NewRecordsProcessing",
+						"SplitNewAndExisting@ExistingRecords derive(Updates = Updates + 1) ~> UpdateExistingRecords",
+						"CheckExistingTitles select(mapColumn(",
+						"          RecentISSN_L,",
+						"          RecentYear,",
+						"          APC_ID = select2@APC_ID,",
+						"          Title_ID = select2@Title_ID,",
+						"          TidyISSN_L,",
+						"          Publisher_Short = select2@Publisher_Short,",
+						"          Publisher_Short_OA = select2@Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID = select2@wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher = select2@Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title = select2@Title,",
+						"          Source_title = select2@Source_title,",
+						"          Source,",
+						"          Model = select2@Model,",
+						"          Model_Notes,",
+						"          APC = select2@APC,",
+						"          Currency,",
+						"          TidyYear,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model,",
+						"          APC_ID = sourceAPCTitles@APC_ID,",
+						"          ISSN_L,",
+						"          Title_ID = sourceAPCTitles@Title_ID,",
+						"          Source_title = sourceAPCTitles@Source_title,",
+						"          Title = sourceAPCTitles@Title,",
+						"          Publisher = sourceAPCTitles@Publisher,",
+						"          Publisher_Short = sourceAPCTitles@Publisher_Short,",
+						"          Publisher_Short_OA = sourceAPCTitles@Publisher_Short_OA,",
+						"          Year,",
+						"          Model = sourceAPCTitles@Model,",
+						"          APC = sourceAPCTitles@APC,",
+						"          Source_title_history,",
+						"          Title_history,",
+						"          Publisher_history,",
+						"          Publisher_history_OA,",
+						"          Year_history,",
+						"          ID_history,",
+						"          wUID = sourceAPCTitles@wUID,",
+						"          Contiguous,",
+						"          Updates,",
+						"          Child_records,",
+						"          Change_publisher",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"JoinMostRecentMetadata select(mapColumn(",
+						"          RecentISSN_L = APCMostRecents@ISSN_L,",
+						"          RecentYear = APCMostRecents@Year,",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          TidyISSN_L = sourceAPCTidy@ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          TidyYear = sourceAPCTidy@Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"NewRecordsProcessing sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCImportMap"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceImportTidy"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_issnToissnL",
+								"type": "DatasetReference"
+							},
+							"name": "sourceISSNToISSNL"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+								"type": "DatasetReference"
+							},
+							"name": "CreateAPCTidyISSNLs"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "lookup2"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as long,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as long,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceImportTidy",
+						"source(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceISSNToISSNL",
+						"filter1 derive(ISSN_L_via = iif(not(isNull(sourceISSNToISSNL@ISSN_L)),'ISSNtoISSN_L table',toString(null())),",
+						"          APC_ID = toLong(APC_ID),",
+						"          wUID = toLong(wUID)) ~> derivedColumn1",
+						"sourceImportTidy, sourceISSNToISSNL lookup(ISSN2 == ISSN,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup2",
+						"derivedColumn1 select(mapColumn(",
+						"          wUID,",
+						"          ISSN = ISSN1,",
+						"          ISSN_L = sourceISSNToISSNL@ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"lookup1 filter(not(isNull(ISSN1)) && (not(startsWith(Model_Notes, 'DELETE')) || isNull(Model_Notes))\r",
+						"\r",
+						"/* not(isNull(ISSN1)) */) ~> filter1",
+						"lookup2 filter(not(isNull(ISSN2)) && (not(startsWith(Model_Notes, 'DELETE')) || isNull(Model_Notes))\r",
+						"\r",
+						"/* not(isNull(ISSN2)) */) ~> filter2",
+						"sourceImportTidy, sourceISSNToISSNL lookup(ISSN1 == ISSN,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"filter2 derive(ISSN_L_via = iif(not(isNull(sourceISSNToISSNL@ISSN_L)),'ISSNtoISSN_L table',toString(null())),",
+						"          wUID = toLong(wUID),",
+						"          APC_ID = toLong(APC_ID)) ~> derivedColumn2",
+						"derivedColumn2 select(mapColumn(",
+						"          wUID,",
+						"          ISSN = ISSN1,",
+						"          ISSN_L = sourceISSNToISSNL@ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1, select2 union(byName: true)~> union1",
+						"union1 sort(asc(ISSN, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          wUID as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as string,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Old_Table as string,",
+						"          Old_wUID as string,",
+						"          Old_Year as string,",
+						"          DAO as string,",
+						"          Publisher as string",
+						"     ),",
+						"     partitionFileNames:['MissingIssnl.csv'],",
+						"     truncate: true,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> CreateAPCTidyISSNLs"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCImportMap"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_issnToissnL",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTidyISSNLs"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "lookup2"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "APCTidyISSNLs"
+						},
+						{
+							"name": "filter3"
+						},
+						{
+							"name": "derivedMissingTable"
+						},
+						{
+							"name": "filter4"
+						},
+						{
+							"name": "selectwUID"
+						},
+						{
+							"name": "lookup3"
+						},
+						{
+							"name": "lookup4"
+						},
+						{
+							"name": "derivedViawUID"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source2",
+						"filter1 derive(ISSN_L_via = 'ISSNtoISSN_L table') ~> derivedColumn1",
+						"source1, source2 lookup(ISSN2 == ISSN,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup2",
+						"derivedColumn1 select(mapColumn(",
+						"          wUID,",
+						"          ISSN = ISSN1,",
+						"          ISSN_L = source2@ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"lookup1 filter(not(isNull(ISSN1))) ~> filter1",
+						"lookup2 filter(not(isNull(ISSN2))) ~> filter2",
+						"source1, source2 lookup(ISSN1 == ISSN,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"filter2 derive(ISSN_L_via = 'ISSNtoISSN_L table') ~> derivedColumn2",
+						"derivedColumn2 select(mapColumn(",
+						"          wUID,",
+						"          ISSN = ISSN1,",
+						"          ISSN_L = source2@ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select1, select2 union(byName: true)~> union1",
+						"union1 select(mapColumn(",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L,",
+						"          Title,",
+						"          Source_title,",
+						"          Publisher,",
+						"          PublisherID,",
+						"          ISSN_L_via",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> APCTidyISSNLs",
+						"derivedMissingTable filter(not(isNull(ISSN_L))) ~> filter3",
+						"lookup3 derive(wUID = union1@wUID,",
+						"          ISSN_L = iif(not(isNull(ISSN_L)),ISSN_L,toString(null()))) ~> derivedMissingTable",
+						"union1 filter(isNull(ISSN_L)) ~> filter4",
+						"filter4 select(mapColumn(",
+						"          wUID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectwUID",
+						"union1, selectwUID lookup(union1@wUID == selectwUID@wUID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup3",
+						"APCTidyISSNLs, derivedMissingTable lookup(APCTidyISSNLs@wUID == derivedMissingTable@wUID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup4",
+						"lookup4 derive(ISSN_L = :missing_ISSN_L_v,",
+						"          ISSN_L_via = iif(not(isNull(:missing_ISSN_L_v)),'wUID',toString(null())),",
+						"          missing_ISSN_L_v := iif(isNull(APCTidyISSNLs@ISSN_L),derivedMissingTable@ISSN_L,APCTidyISSNLs@ISSN_L)) ~> derivedViawUID",
+						"derivedViawUID sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          wUID as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as string,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Old_Table as string,",
+						"          Old_wUID as string,",
+						"          Old_Year as string,",
+						"          DAO as string,",
+						"          Publisher as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTidyISSNLs"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Map_modelNotes_Delete')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCImportMap"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceImportTidy"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_gold_apcimport1",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCImport1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_gold_apcimport2",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCImport2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "UpdateAPCTidy"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "filter3"
+						},
+						{
+							"name": "filter4"
+						},
+						{
+							"name": "selectwUIDImport1"
+						},
+						{
+							"name": "selectwUIDImport2"
+						},
+						{
+							"name": "lookup2"
+						},
+						{
+							"name": "lookup3"
+						},
+						{
+							"name": "selectAPCTidyColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as long,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as long,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceImportTidy",
+						"source(output(",
+						"          wUID as short,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as short,",
+						"          JoiningID as short,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as timestamp,",
+						"          Old_Table as string,",
+						"          Old_wUID as short,",
+						"          Old_Year as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCImport1",
+						"source(output(",
+						"          wUID as short,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as short,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as timestamp,",
+						"          Old_Table as string,",
+						"          Old_wUID as short,",
+						"          Old_Year as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCImport2",
+						"lookup3 derive(Model_Notes = iif(\r",
+						"    not(isNull(Model_Notes)) && not(startsWith(Model_Notes, 'DELETE') && \r",
+						"    ((Import1ID == toString(selectwUIDImport1@wUID)) || Import2ID == toString(selectwUIDImport2@wUID))),\r",
+						"    \"DELETE - as marked\",\r",
+						"    Model_Notes),",
+						"          ISSN_L = toString(null())) ~> derivedColumn1",
+						"sourceAPCImport1 filter(startsWith({Model Notes}, 'DELETE')) ~> filter3",
+						"sourceAPCImport2 filter(startsWith({Model Notes}, 'DELETE')) ~> filter4",
+						"filter3 select(mapColumn(",
+						"          wUID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectwUIDImport1",
+						"filter4 select(mapColumn(",
+						"          wUID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectwUIDImport2",
+						"sourceImportTidy, selectwUIDImport1 lookup(Import1ID == toString(selectwUIDImport1@wUID),",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup2",
+						"lookup2, selectwUIDImport2 lookup(Import2ID == toString(selectwUIDImport2@wUID),",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup3",
+						"derivedColumn1 select(mapColumn(",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID = sourceImportTidy@wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectAPCTidyColumns",
+						"selectAPCTidyColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['APCTidy.csv'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> UpdateAPCTidy"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCImport_Tidy')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_APCImport1_2025",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_gold_APCImport2_2025",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_apc_JournalNames_clean",
+								"type": "DatasetReference"
+							},
+							"name": "source3"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_apc_PublisherManual",
+								"type": "DatasetReference"
+							},
+							"name": "source4"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_apc_Publishers",
+								"type": "DatasetReference"
+							},
+							"name": "source5"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTidy"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "derivedColumn5"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "APCTidyAll"
+						},
+						{
+							"name": "derivedColumn7"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "APCTidy"
+						},
+						{
+							"name": "lookup2"
+						},
+						{
+							"name": "selectAPCTidy"
+						},
+						{
+							"name": "lookup3"
+						},
+						{
+							"name": "derivedColumn8"
+						},
+						{
+							"name": "join3"
+						},
+						{
+							"name": "select4"
+						},
+						{
+							"name": "window1"
+						},
+						{
+							"name": "lookup4"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          {License Types} as string,",
+						"          Year as short,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          DAO as integer,",
+						"          Publisher as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     partitionRootPath: 'gold/import1/') ~> source1",
+						"source(output(",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          {License Types} as string,",
+						"          Year as short,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          DAO as integer,",
+						"          Publisher as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     partitionRootPath: 'gold/import2/') ~> source2",
+						"source(output(",
+						"          Idx as string,",
+						"          Name_Raw as string,",
+						"          Name_Match as string,",
+						"          Name_Punct as string,",
+						"          Name_Abbrev as string,",
+						"          Name_Clean as string,",
+						"          Name_Abbrev_OLD as string,",
+						"          Source as string,",
+						"          Notes as string,",
+						"          done as string,",
+						"          bak as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source3",
+						"source(output(",
+						"          Publisher_Raw as string,",
+						"          Publisher_Short as string,",
+						"          Imprint_OA as string,",
+						"          DAO as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source4",
+						"source(output(",
+						"          Publisher_Short as string,",
+						"          Definitive_Name as string,",
+						"          Parent_Publisher as string,",
+						"          In_Sample as boolean,",
+						"          In_Survey as boolean,",
+						"          Society as boolean,",
+						"          University as boolean,",
+						"          OA_Type as string,",
+						"          OA_Year as short",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source5",
+						"derivedColumn1, derivedColumn2 join(source1@JoiningID == source2@JoiningID",
+						"     && source1@Year == source2@Year",
+						"     && source1@Publisher == source2@Publisher",
+						"     && source1@DAO == source2@DAO,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"derivedColumn1, derivedColumn2 join(source1@JoiningID == source2@JoiningID",
+						"     && source1@Year == source2@Year",
+						"     && source1@Publisher == source2@Publisher",
+						"     && source1@DAO == source2@DAO,",
+						"     joinType:'right',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"source1 derive(wUID = toString(null()),",
+						"          TJ = toString(null()),",
+						"          Audit = toString(null()),",
+						"          Old_Table = toString(null()),",
+						"          Old_wUID = toString(null()),",
+						"          Old_Year = toString(null())) ~> derivedColumn1",
+						"source2 derive(wUID = toString(null()),",
+						"          TJ = toString(null()),",
+						"          Audit = toString(null()),",
+						"          Old_Table = toString(null()),",
+						"          Old_wUID = toString(null()),",
+						"          Old_Year = toString(null())) ~> derivedColumn2",
+						"join1 derive(Import1ID = derivedColumn1@wUID,",
+						"          Import2ID = derivedColumn2@wUID,",
+						"          Publisher = coalesce(source1@Publisher, source2@Publisher),",
+						"          ISSN1 = coalesce(source1@ISSN1,source2@ISSN1),",
+						"          ISSN2 = iif(!isNull(source1@ISSN2), source1@ISSN2, ",
+						"    iif(source2@ISSN1 == source1@ISSN1, toString(null()), ",
+						"        iif(source2@ISSN2 == source1@ISSN1, toString(null()), source2@ISSN2)",
+						"    )",
+						"),",
+						"          Title = coalesce(source1@Title,source2@Title),",
+						"          Source = coalesce(source1@Source,source2@Source),",
+						"          Model = coalesce(source2@Model,source1@Model),",
+						"          Model_Notes = coalesce(source1@{Model Notes},source2@{Model Notes}),",
+						"          APC = coalesce(source2@APC,source1@APC),",
+						"          Currency = coalesce(source2@Currency,source1@Currency),",
+						"          Year = source1@Year,",
+						"          DAO = source1@DAO,",
+						"          LicenseType = coalesce(source2@{License Types},source1@{License Types}),",
+						"          PublisherID = coalesce(source1@PublisherID, source2@PublisherID),",
+						"          JoiningID = coalesce(source1@JoiningID, source2@JoiningID),",
+						"          Imprint = coalesce(source1@Imprint, source2@Imprint),",
+						"          Society = coalesce(source1@Society, source2@Society),",
+						"          TJ = derivedColumn2@TJ,",
+						"          Audit = derivedColumn1@Audit,",
+						"          Import1_Old_Table = derivedColumn1@Old_Table,",
+						"          Import1_Old_wUID = derivedColumn1@Old_wUID,",
+						"          Import1_Old_Year = derivedColumn1@Old_Year,",
+						"          Present_via = coalesce(source2@JoiningID,'APCimport1 only'),",
+						"          Publication_Data_Year = source1@Year,",
+						"          Metrics_Data_Year = source1@Year,",
+						"          Import2_Old_Table = derivedColumn2@Old_Table,",
+						"          Import2_Old_wUID = derivedColumn2@Old_wUID,",
+						"          Import2_Old_Year = derivedColumn2@Old_Year,",
+						"          ISSN_X = toString(null()),",
+						"          ISSNs_in_order = toString(null()),",
+						"          IY = toString(null()),",
+						"          IYP = toString(null())) ~> derivedColumn3",
+						"derivedColumn3 select(mapColumn(",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSNs_in_order,",
+						"          ISSN_X,",
+						"          IY,",
+						"          IYP",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"join2 filter(isNull(source1@JoiningID)) ~> filter1",
+						"filter1 derive(Import1ID = derivedColumn1@wUID,",
+						"          Import2ID = derivedColumn2@wUID,",
+						"          Present_via = 'APCimport2 only',",
+						"          Publisher = source2@Publisher,",
+						"          ISSN1 = source2@ISSN1,",
+						"          ISSN2 = source2@ISSN2,",
+						"          Title = source2@Title,",
+						"          Source = source2@Source,",
+						"          Model = source2@Model,",
+						"          Model_Notes = source2@{Model Notes},",
+						"          APC = source2@APC,",
+						"          Currency = source2@Currency,",
+						"          Year = source2@Year,",
+						"          DAO = source2@DAO,",
+						"          LicenseType = source2@{License Types},",
+						"          PublisherID = source2@PublisherID,",
+						"          JoiningID = source2@JoiningID,",
+						"          Imprint = source2@Imprint,",
+						"          Society = source2@Society,",
+						"          TJ = derivedColumn2@TJ,",
+						"          Audit = derivedColumn2@Audit,",
+						"          Import1_Old_Table = derivedColumn2@Old_Table,",
+						"          Import1_Old_wUID = derivedColumn2@Old_wUID,",
+						"          Import1_Old_Year = derivedColumn2@Old_Year,",
+						"          Publication_Data_Year = source2@Year,",
+						"          Metrics_Data_Year = source2@Year-2,",
+						"          Import2_Old_Table = toString(null())",
+						"/* Refer line number 217 -219 in APC Import Tidy.sql */,",
+						"          Import2_Old_wUID = toString(null()) /* Refer line number 217 -219 in APC Import Tidy.sql */,",
+						"          Import2_Old_Year = toString(null()) /* Refer line number 217 -219 in APC Import Tidy.sql */,",
+						"          ISSN_X = toString(null()),",
+						"          ISSNs_in_order = toString(null()),",
+						"          IY = toString(null()),",
+						"          IYP = toString(null())) ~> derivedColumn4",
+						"derivedColumn4 select(mapColumn(",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSNs_in_order,",
+						"          ISSN_X,",
+						"          IY,",
+						"          IYP",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2, select1 union(byName: true)~> union1",
+						"window1 select(mapColumn(",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source = union1@Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSNs_in_order,",
+						"          ISSN_X,",
+						"          IY,",
+						"          IYP,",
+						"          Source_title,",
+						"          Idx,",
+						"          Name_Raw,",
+						"          Name_Match,",
+						"          Name_Punct,",
+						"          Name_Abbrev,",
+						"          Name_Clean,",
+						"          Name_Abbrev_OLD,",
+						"          Source = source3@Source,",
+						"          Notes,",
+						"          done,",
+						"          bak,",
+						"          wUID",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"union1 derive(Year = iif(Year < 2024 ,Year+1,toInteger(Year)),",
+						"          Model = iif(isNull(Model) || Model == '0' || Model =='' || Model == 'n/a',trim('None'),trim(Model)),",
+						"          ISSN_X = :ISSN_X_v,",
+						"          ISSN1 = coalesce(:ISSN1_v,:ISSN_X_v),",
+						"          ISSN2 = iif(ISSN2 == :ISSN1_v, toString(null()), ISSN2),",
+						"          APC = replace(replace(replace(APC, '$',''),',',''),'-',''),",
+						"          ISSNs_in_order = replace(coalesce(concat(least(ISSN1,ISSN2),greatest(ISSN1,ISSN2)),ISSN1,ISSN2,''),'-',''),",
+						"          IY = concat(ISSNs_in_order,toString(Year)),",
+						"          IYP = concat(ISSNs_in_order,toString(Year),Publisher),",
+						"          Currency = iif(Currency == '' || Currency == 'N/A',toString(null()),Currency),",
+						"          Title = :Title_v,",
+						"          Source_title = :Title_v,",
+						"          ISSN_X_v := concat(left(soundex(Title),4),'-',right(soundex(Title),4)),",
+						"          ISSN1_v := iif(isNull(ISSN1) && not(isNull(ISSN2)), ISSN2, ISSN1),",
+						"          Title_v := trim(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace",
+						"    (replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace",
+						"    (replace(Title, '√≠','í'),'√≥','ó'),'√ß','ç'),'√©','é'),'√£','ã'),'√™','ê'),'√®','è'),'√ç','i'), ",
+						"    '√±','ñ'),'√°','á'),'√â','É'),'√∫','ú'),'√º','ü'),'&#257;','ā'),'&#333;','ō'),'&#39;','\\''),'®',''),",
+						"    '&ndash;','-'),'&mdash','-'),'&amp;','&'),'™',''), ' ',' '), '  ',' '),'  ',' '))",
+						"",
+						"/* -- Remove diacriticals (side effect of using PDFs to populate some of the source spreadsheets)",
+						"     -- NOTE: here we rely on Mac's characterset in Querious handling the diacritcals below. See Character set analysis for more on this.",
+						"     -- √X are Unicode misinterpreted as Mac-Roman, typically in APCimport2: https://stackoverflow.com/questions/15283189/how-to-decode-these-characters-√-√-√≠",
+						"     -- *** FULL LIST of these at the end of this query...these are what we spotted",
+						"     -- *** ADD AS NEEDED EACH YEAR - see check just below */) ~> derivedColumn5",
+						"derivedColumn5 filter(not(isNull(Title))) ~> filter2",
+						"filter2, source3 lookup(Source_title == Name_Raw,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 derive(Title = coalesce(Name_Clean,Source_title)) ~> APCTidyAll",
+						"select3 derive(condition_where = :modelNotes_Delete_v,",
+						"          condition_gp = :gpBy_v,",
+						"          modelNotes_Delete_v := iif(startsWith(Model_Notes, 'DELETE - '), 1e7, toFloat(0)) + wUID,",
+						"          gpBy_v := iif(isNull(Import1ID), wUID + 1e7, toFloat(Import1ID))) ~> derivedColumn7",
+						"derivedColumn7 aggregate(groupBy(Year,",
+						"          condition_gp),",
+						"     subquery_output = min(condition_where)) ~> aggregate1",
+						"select3 derive(APC_ID = wUID,",
+						"          Title_ID = toString(null()),",
+						"          ISSN_L = ISSN1,",
+						"          Publisher_Short = Publisher,",
+						"          Publisher_Short_OA = Publisher,",
+						"          Publisher_OA_type = 'Mixed Model',",
+						"          Unique_title = Source_title,",
+						"          Currency_Data_Year = Year-1,",
+						"          Inflation_Data_Year = Year-1,",
+						"          years_zero_APC = 0,",
+						"          last_year_APC = APC,",
+						"          last_year_model = Model,",
+						"          next_year_model = Model) ~> APCTidy",
+						"APCTidy, aggregate1 lookup(wUID == subquery_output,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup2",
+						"derivedColumn8 select(mapColumn(",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year = select3@Year,",
+						"          DAO = select3@DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectAPCTidy",
+						"lookup2, source4 lookup(Imprint == Publisher_Raw,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup3",
+						"lookup4 derive(Publisher_Short_OA = coalesce(iifNull(source4@Imprint_OA,''),APCTidy@Publisher_Short),",
+						"          Imprint = iif(Imprint == '' || Imprint == '0' || Imprint == '(Publisher)' || Imprint == '#N/A',toString(null()),Imprint)",
+						"",
+						"/* iif(in(['','0','(Publisher)','#N/A'],Imprint),toString(null(),Imprint) */,",
+						"          Society = iif(in(['0', '', '-', '#N/A', '(Publisher)', 'Publisher'],select3@Society),toString(null()), select3@Society),",
+						"          Currency = iif(Currency == '' || Currency == 'N/A', toString(null()),Currency),",
+						"          Publisher = Definitive_Name,",
+						"          Publisher_Short = source4@Publisher_Short,",
+						"          Publisher_OA_type = iif(select3@Year >= OA_Year,OA_Type,'Mixed Model')) ~> derivedColumn8",
+						"source5, source4 join(source5@Publisher_Short == source4@Publisher_Short,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join3",
+						"join3 select(mapColumn(",
+						"          Publisher_Short = source5@Publisher_Short,",
+						"          Definitive_Name,",
+						"          Parent_Publisher,",
+						"          In_Sample,",
+						"          In_Survey,",
+						"          Society,",
+						"          University,",
+						"          OA_Type,",
+						"          OA_Year,",
+						"          Publisher_Raw,",
+						"          Publisher_Short = source4@Publisher_Short,",
+						"          Imprint_OA,",
+						"          DAO",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"APCTidyAll window(asc(Publisher, false),",
+						"     wUID = rowNumber()) ~> window1",
+						"lookup3, select4 lookup(Publisher == select4@Publisher_Raw,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup4",
+						"selectAPCTidy sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTidy"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCMasterListInsertPublisherManualShort')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCMasterList"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_apc_PublisherManual",
+								"type": "DatasetReference"
+							},
+							"name": "sourcePublisherManual"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_PublisherManual",
+								"type": "DatasetReference"
+							},
+							"name": "sinkInsertIntoPubManual"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "selectColumnsForPublisherManual"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "unionToInsertNewPublisherShort"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+						"source(output(",
+						"          Publisher_Raw as string,",
+						"          Publisher_Short as string,",
+						"          Imprint_OA as string,",
+						"          DAO as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourcePublisherManual",
+						"sourceAPCTitles, sourcePublisherManual join(Publisher == Publisher_Raw,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 filter(isNull(sourceAPCTitles@Publisher_Short)) ~> filter1",
+						"filter1 aggregate(groupBy(Publisher),",
+						"     cnt_dummy = count(Publisher)) ~> aggregate1",
+						"derivedColumn1 select(mapColumn(",
+						"          Publisher,",
+						"          Publisher_Short = Pub_short,",
+						"          Imprint_OA,",
+						"          DAO",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectColumnsForPublisherManual",
+						"aggregate1 derive(Pub_short = left(Publisher,locate(' ',concat(Publisher,' '))),",
+						"          Imprint_OA = toString(null()),",
+						"          DAO = toString(null())) ~> derivedColumn1",
+						"selectColumnsForPublisherManual, sourcePublisherManual union(byName: true)~> unionToInsertNewPublisherShort",
+						"unionToInsertNewPublisherShort sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Publisher_Raw as string,",
+						"          Publisher_Short as string,",
+						"          Imprint_OA as string,",
+						"          DAO as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkInsertIntoPubManual"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCMasterListStep2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCMasterList"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidy"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTidy"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate2"
+						},
+						{
+							"name": "select8"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "join3"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "selectTidyColumns"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "select9"
+						},
+						{
+							"name": "selectToSinkTidy"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as short,",
+						"          ISSN_L as string,",
+						"          Title_ID as integer,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as short,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as integer,",
+						"          Contiguous as boolean,",
+						"          Updates as short,",
+						"          Child_records as short,",
+						"          Change_publisher as boolean",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+						"source(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+						"selectTidyColumns aggregate(groupBy(ISSN_L = TidyISSN_L,",
+						"          Year = TidyYear),",
+						"     No_Of_Child_Records = count(TidyISSN_L)) ~> aggregate2",
+						"aggregate2 select(skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select8",
+						"select8, sourceAPCTitles join(select8@ISSN_L == sourceAPCTitles@ISSN_L",
+						"     && select8@Year == sourceAPCTitles@Year,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 derive(Child_records = No_Of_Child_Records) ~> derivedColumn2",
+						"select1, select2 join(TitlesISSN_L == TidyISSN_L,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join3",
+						"join3 derive(TidyAPC_ID = TitlesAPC_ID,",
+						"          TidyUnique_title = TitlesSource_title) ~> derivedColumn3",
+						"derivedColumn3 select(mapColumn(",
+						"          TidyAPC_ID,",
+						"          TidyTitle_ID,",
+						"          TidyISSN_L,",
+						"          TidyPublisher_Short,",
+						"          TidyPublisher_Short_OA,",
+						"          TidyPublisher_OA_type,",
+						"          TidyUnique_title,",
+						"          TidywUID,",
+						"          TidyImport1ID,",
+						"          TidyImport2ID,",
+						"          TidyPublisher,",
+						"          TidyISSN1,",
+						"          TidyISSN2,",
+						"          TidyTitle,",
+						"          TidySource_title,",
+						"          TidySource,",
+						"          TidyModel,",
+						"          TidyModel_Notes,",
+						"          TidyAPC,",
+						"          TidyCurrency,",
+						"          TidyYear,",
+						"          TidyDAO,",
+						"          TidyLicenseType,",
+						"          TidyPublisherID,",
+						"          TidyJoiningID,",
+						"          TidyImprint,",
+						"          TidySociety,",
+						"          TidyTJ,",
+						"          TidyAudit,",
+						"          TidyImport1_Old_Table,",
+						"          TidyImport1_Old_wUID,",
+						"          TidyImport1_Old_Year,",
+						"          TidyPresent_via,",
+						"          TidyImport2_Old_Table,",
+						"          TidyImport2_Old_wUID,",
+						"          TidyImport2_Old_Year,",
+						"          TidyISSN_X,",
+						"          TidyISSNs_in_order,",
+						"          TidyIY,",
+						"          TidyIYP,",
+						"          TidyPublication_Data_Year,",
+						"          TidyMetrics_Data_Year,",
+						"          TidyCurrency_Data_Year,",
+						"          TidyInflation_Data_Year,",
+						"          Tidylast_year_APC,",
+						"          Tidyyears_zero_APC,",
+						"          Tidylast_year_model,",
+						"          Tidynext_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectTidyColumns",
+						"sourceAPCTitles select(mapColumn(",
+						"          TitlesAPC_ID = APC_ID,",
+						"          TitlesISSN_L = ISSN_L,",
+						"          TitlesTitle_ID = Title_ID,",
+						"          TitlesSource_title = Source_title,",
+						"          TitlesTitle = Title,",
+						"          TitlesPublisher = Publisher,",
+						"          TitlesPublisher_Short = Publisher_Short,",
+						"          TitlesPublisher_Short_OA = Publisher_Short_OA,",
+						"          TitlesYear = Year,",
+						"          TitlesModel = Model,",
+						"          TitlesAPC = APC,",
+						"          TitlesSource_title_history = Source_title_history,",
+						"          TitlesTitle_history = Title_history,",
+						"          TitlesPublisher_history = Publisher_history,",
+						"          TitlesPublisher_history_OA = Publisher_history_OA,",
+						"          TitlesYear_history = Year_history,",
+						"          TitlesID_history = ID_history,",
+						"          TitleswUID = wUID,",
+						"          TitlesContiguous = Contiguous,",
+						"          TitlesUpdates = Updates,",
+						"          TitlesChild_records = Child_records,",
+						"          TitlesChange_publisher = Change_publisher",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"sourceAPCTidy select(mapColumn(",
+						"          TidyAPC_ID = APC_ID,",
+						"          TidyTitle_ID = Title_ID,",
+						"          TidyISSN_L = ISSN_L,",
+						"          TidyPublisher_Short = Publisher_Short,",
+						"          TidyPublisher_Short_OA = Publisher_Short_OA,",
+						"          TidyPublisher_OA_type = Publisher_OA_type,",
+						"          TidyUnique_title = Unique_title,",
+						"          TidywUID = wUID,",
+						"          TidyImport1ID = Import1ID,",
+						"          TidyImport2ID = Import2ID,",
+						"          TidyPublisher = Publisher,",
+						"          TidyISSN1 = ISSN1,",
+						"          TidyISSN2 = ISSN2,",
+						"          TidyTitle = Title,",
+						"          TidySource_title = Source_title,",
+						"          TidySource = Source,",
+						"          TidyModel = Model,",
+						"          TidyModel_Notes = Model_Notes,",
+						"          TidyAPC = APC,",
+						"          TidyCurrency = Currency,",
+						"          TidyYear = Year,",
+						"          TidyDAO = DAO,",
+						"          TidyLicenseType = LicenseType,",
+						"          TidyPublisherID = PublisherID,",
+						"          TidyJoiningID = JoiningID,",
+						"          TidyImprint = Imprint,",
+						"          TidySociety = Society,",
+						"          TidyTJ = TJ,",
+						"          TidyAudit = Audit,",
+						"          TidyImport1_Old_Table = Import1_Old_Table,",
+						"          TidyImport1_Old_wUID = Import1_Old_wUID,",
+						"          TidyImport1_Old_Year = Import1_Old_Year,",
+						"          TidyPresent_via = Present_via,",
+						"          TidyImport2_Old_Table = Import2_Old_Table,",
+						"          TidyImport2_Old_wUID = Import2_Old_wUID,",
+						"          TidyImport2_Old_Year = Import2_Old_Year,",
+						"          TidyISSN_X = ISSN_X,",
+						"          TidyISSNs_in_order = ISSNs_in_order,",
+						"          TidyIY = IY,",
+						"          TidyIYP = IYP,",
+						"          TidyPublication_Data_Year = Publication_Data_Year,",
+						"          TidyMetrics_Data_Year = Metrics_Data_Year,",
+						"          TidyCurrency_Data_Year = Currency_Data_Year,",
+						"          TidyInflation_Data_Year = Inflation_Data_Year,",
+						"          Tidylast_year_APC = last_year_APC,",
+						"          Tidyyears_zero_APC = years_zero_APC,",
+						"          Tidylast_year_model = last_year_model,",
+						"          Tidynext_year_model = next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"derivedColumn2 select(mapColumn(",
+						"          APC_ID,",
+						"          ISSN_L = sourceAPCTitles@ISSN_L,",
+						"          Title_ID,",
+						"          Source_title,",
+						"          Title,",
+						"          Publisher,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Year = sourceAPCTitles@Year,",
+						"          Model,",
+						"          APC,",
+						"          Source_title_history,",
+						"          Title_history,",
+						"          Publisher_history,",
+						"          Publisher_history_OA,",
+						"          Year_history,",
+						"          ID_history,",
+						"          wUID,",
+						"          Contiguous,",
+						"          Updates,",
+						"          Child_records,",
+						"          Change_publisher",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select9",
+						"selectTidyColumns select(mapColumn(",
+						"          APC_ID = TidyAPC_ID,",
+						"          Title_ID = TidyTitle_ID,",
+						"          ISSN_L = TidyISSN_L,",
+						"          Publisher_Short = TidyPublisher_Short,",
+						"          Publisher_Short_OA = TidyPublisher_Short_OA,",
+						"          Publisher_OA_type = TidyPublisher_OA_type,",
+						"          Unique_title = TidyUnique_title,",
+						"          wUID = TidywUID,",
+						"          Import1ID = TidyImport1ID,",
+						"          Import2ID = TidyImport2ID,",
+						"          Publisher = TidyPublisher,",
+						"          ISSN1 = TidyISSN1,",
+						"          ISSN2 = TidyISSN2,",
+						"          Title = TidyTitle,",
+						"          Source_title = TidySource_title,",
+						"          Source = TidySource,",
+						"          Model = TidyModel,",
+						"          Model_Notes = TidyModel_Notes,",
+						"          APC = TidyAPC,",
+						"          Currency = TidyCurrency,",
+						"          Year = TidyYear,",
+						"          DAO = TidyDAO,",
+						"          LicenseType = TidyLicenseType,",
+						"          PublisherID = TidyPublisherID,",
+						"          JoiningID = TidyJoiningID,",
+						"          Imprint = TidyImprint,",
+						"          Society = TidySociety,",
+						"          TJ = TidyTJ,",
+						"          Audit = TidyAudit,",
+						"          Import1_Old_Table = TidyImport1_Old_Table,",
+						"          Import1_Old_wUID = TidyImport1_Old_wUID,",
+						"          Import1_Old_Year = TidyImport1_Old_Year,",
+						"          Present_via = TidyPresent_via,",
+						"          Import2_Old_Table = TidyImport2_Old_Table,",
+						"          Import2_Old_wUID = TidyImport2_Old_wUID,",
+						"          Import2_Old_Year = TidyImport2_Old_Year,",
+						"          ISSN_X = TidyISSN_X,",
+						"          ISSNs_in_order = TidyISSNs_in_order,",
+						"          IY = TidyIY,",
+						"          IYP = TidyIYP,",
+						"          Publication_Data_Year = TidyPublication_Data_Year,",
+						"          Metrics_Data_Year = TidyMetrics_Data_Year,",
+						"          Currency_Data_Year = TidyCurrency_Data_Year,",
+						"          Inflation_Data_Year = TidyInflation_Data_Year,",
+						"          last_year_APC = Tidylast_year_APC,",
+						"          years_zero_APC = Tidyyears_zero_APC,",
+						"          last_year_model = Tidylast_year_model,",
+						"          next_year_model = Tidynext_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectToSinkTidy",
+						"select9 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTitles",
+						"selectToSinkTidy sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTidy"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCMasterListStep3')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCMasterList"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidy"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APC_ISSNs",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCISSNs"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APC_ISSNs",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "DeriveHistoryTable"
+						},
+						{
+							"name": "selectRequiredColumns"
+						},
+						{
+							"name": "joinHistoryAPCTitles"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "selectTitlesColumns"
+						},
+						{
+							"name": "joinAPCIssnsAPCTidy"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "selectAPCISSNsColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+						"source(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+						"source(output(",
+						"          APC_ID as short,",
+						"          wUID as short,",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCISSNs",
+						"sourceAPCTidy aggregate(groupBy(ISSN_L),",
+						"     cnt_dummy = count(ISSN_L),",
+						"          titleList = collect(concat(toString(Title),'|',toString(Year)))",
+						"",
+						"/* collect(Title) collectUnique(Title) */,",
+						"          sourceList = collect(concat(toString(Source_title),'|',toString(Year))),",
+						"          yearList = collect(concat(toString(Year),'|',toString(Year))),",
+						"          pubList = collect(concat(toString(Publisher_Short),'|',toString(Year))),",
+						"          poaList = collect(concat(toString(Publisher_Short_OA),'|',toString(Year))),",
+						"          idList = collect(concat(toString(wUID),'|',toString(Year))),",
+						"          cgu = countIf(true(), 1) == (max(toLong(Year)) - min(toLong(Year)) + 1)) ~> aggregate1",
+						"aggregate1 derive(t = iif(size(titleList) > 0, toString(titleList[1]), ''),",
+						"          st = iif(size(sourceList) > 0, toString(sourceList[1]), ''),",
+						"          y = iif(size(yearList) > 0, toString(yearList[1]), ''),",
+						"          p = iif(size(pubList) > 0, toString(pubList[1]), ''),",
+						"          poa = iif(size(poaList) > 0, toString(poaList[1]), ''),",
+						"          IDs = iif(size(idList) > 0, toString(idList[1]), '')) ~> DeriveHistoryTable",
+						"DeriveHistoryTable select(mapColumn(",
+						"          ISSN_L,",
+						"          cgu,",
+						"          t,",
+						"          st,",
+						"          y,",
+						"          p,",
+						"          poa,",
+						"          IDs",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+						"selectRequiredColumns, sourceAPCTitles join(selectRequiredColumns@ISSN_L == sourceAPCTitles@ISSN_L,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinHistoryAPCTitles",
+						"joinHistoryAPCTitles derive(Title_history = t,",
+						"          Source_title_history = st,",
+						"          Year_history = y,",
+						"          Publisher_history = p,",
+						"          Publisher_history_OA = poa,",
+						"          ID_history = IDs,",
+						"          Contiguous = cgu) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          APC_ID,",
+						"          ISSN_L = sourceAPCTitles@ISSN_L,",
+						"          Title_ID,",
+						"          Source_title,",
+						"          Title,",
+						"          Publisher,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Year,",
+						"          Model,",
+						"          APC,",
+						"          Source_title_history,",
+						"          Title_history,",
+						"          Publisher_history,",
+						"          Publisher_history_OA,",
+						"          Year_history,",
+						"          ID_history,",
+						"          wUID,",
+						"          Contiguous,",
+						"          Updates,",
+						"          Child_records,",
+						"          Change_publisher",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectTitlesColumns",
+						"sourceAPCISSNs, sourceAPCTidy join(sourceAPCISSNs@ISSN_L == sourceAPCTidy@ISSN_L,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinAPCIssnsAPCTidy",
+						"joinAPCIssnsAPCTidy derive(APC_ID = sourceAPCTidy@APC_ID) ~> derivedColumn2",
+						"derivedColumn2 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID = sourceAPCISSNs@wUID,",
+						"          ISSN,",
+						"          ISSN_L = sourceAPCISSNs@ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectAPCISSNsColumns",
+						"selectTitlesColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTitles",
+						"selectAPCISSNsColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APCMasterListStep3_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCMasterList"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidy"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APC_ISSNs",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCISSNs"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APCMaster_APCTitles",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTitles"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APC_ISSNs",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "DeriveHistoryTable"
+						},
+						{
+							"name": "selectRequiredColumns"
+						},
+						{
+							"name": "joinHistoryAPCTitles"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "selectTitlesColumns"
+						},
+						{
+							"name": "joinAPCIssnsAPCTidy"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "selectAPCISSNsColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTitles",
+						"source(output(",
+						"          APC_ID as short,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as short,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+						"source(output(",
+						"          APC_ID as short,",
+						"          wUID as short,",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCISSNs",
+						"sourceAPCTidy aggregate(groupBy(ISSN_L),",
+						"     cnt_dummy = count(ISSN_L),",
+						"          titleList = collect(concat(Title,'|',toString(Year)))",
+						"",
+						"/* collect(Title) collectUnique(Title) */,",
+						"          sourceList = collect(concat(Source_title,'|',toString(Year))),",
+						"          yearList = collect(concat(toString(Year),'|',toString(Year))),",
+						"          pubList = collect(concat(Publisher_Short,'|',toString(Year))),",
+						"          poaList = collect(concat(Publisher_Short_OA,'|',toString(Year))),",
+						"          idList = collect(concat(toString(wUID),'|',toString(Year))),",
+						"          cgu = countIf(true(), 1) == (max(toLong(Year)) - min(toLong(Year)) + 1)) ~> aggregate1",
+						"aggregate1 derive(t = concat(split(sort(titleList, true())[1], '|')[1])",
+						"/* concat(toString(distinct(titleList))) */,",
+						"          st = concat(split(sort(sourceList, true())[1], '|')[1]),",
+						"          y = concat(split(sort(yearList, true())[1], '|')[1]),",
+						"          p = concat(split(sort(pubList, true())[1], '|')[1]),",
+						"          poa = concat(split(sort(poaList, true())[1], '|')[1]),",
+						"          IDs = concat(split(sort(idList, true())[1], '|')[1])) ~> DeriveHistoryTable",
+						"DeriveHistoryTable select(mapColumn(",
+						"          ISSN_L,",
+						"          cgu,",
+						"          t,",
+						"          st,",
+						"          y,",
+						"          p,",
+						"          poa,",
+						"          IDs",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+						"selectRequiredColumns, sourceAPCTitles join(selectRequiredColumns@ISSN_L == sourceAPCTitles@ISSN_L,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinHistoryAPCTitles",
+						"joinHistoryAPCTitles derive(Title_history = t,",
+						"          Source_title_history = st,",
+						"          Year_history = y,",
+						"          Publisher_history = p,",
+						"          Publisher_history_OA = poa,",
+						"          ID_history = IDs,",
+						"          Contiguous = cgu) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          APC_ID,",
+						"          ISSN_L = sourceAPCTitles@ISSN_L,",
+						"          Title_ID,",
+						"          Source_title,",
+						"          Title,",
+						"          Publisher,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Year,",
+						"          Model,",
+						"          APC,",
+						"          Source_title_history,",
+						"          Title_history,",
+						"          Publisher_history,",
+						"          Publisher_history_OA,",
+						"          Year_history,",
+						"          ID_history,",
+						"          wUID,",
+						"          Contiguous,",
+						"          Updates,",
+						"          Child_records,",
+						"          Change_publisher",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectTitlesColumns",
+						"sourceAPCISSNs, sourceAPCTidy join(sourceAPCISSNs@ISSN_L == sourceAPCTidy@ISSN_L,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinAPCIssnsAPCTidy",
+						"joinAPCIssnsAPCTidy derive(APC_ID = sourceAPCTidy@APC_ID) ~> derivedColumn2",
+						"derivedColumn2 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID = sourceAPCISSNs@wUID,",
+						"          ISSN,",
+						"          ISSN_L = sourceAPCISSNs@ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectAPCISSNsColumns",
+						"selectTitlesColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          APC_ID as string,",
+						"          ISSN_L as string,",
+						"          Title_ID as string,",
+						"          Source_title as string,",
+						"          Title as string,",
+						"          Publisher as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Year as string,",
+						"          Model as string,",
+						"          APC as string,",
+						"          Source_title_history as string,",
+						"          Title_history as string,",
+						"          Publisher_history as string,",
+						"          Publisher_history_OA as string,",
+						"          Year_history as string,",
+						"          ID_history as string,",
+						"          wUID as string,",
+						"          Contiguous as string,",
+						"          Updates as string,",
+						"          Child_records as string,",
+						"          Change_publisher as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkAPCTitles",
+						"selectAPCISSNsColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_APC_ISSNs')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/silver to gold/APCImportMap"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_APC_tidy_ISSN_Ls",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidyIssnLs"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_issnToissnL",
+								"type": "DatasetReference"
+							},
+							"name": "sourceissnToissnL"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAPCTidy"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_APC_ISSNs",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCIssns"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_APCImport_Tidy",
+								"type": "DatasetReference"
+							},
+							"name": "sinkAPCTidy"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select3"
+						},
+						{
+							"name": "aggregate2"
+						},
+						{
+							"name": "select4"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "derivedColumn4"
+						},
+						{
+							"name": "select5"
+						},
+						{
+							"name": "aggregate3"
+						},
+						{
+							"name": "select6"
+						},
+						{
+							"name": "union2"
+						},
+						{
+							"name": "sort1"
+						},
+						{
+							"name": "filter3"
+						},
+						{
+							"name": "UpdateAPCTidywithnewISSNL"
+						},
+						{
+							"name": "selectColumnsOfAPCTidy"
+						},
+						{
+							"name": "selectwUIDAndISSNl"
+						},
+						{
+							"name": "filter4"
+						},
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "aggregate4"
+						},
+						{
+							"name": "select7"
+						},
+						{
+							"name": "filter5"
+						},
+						{
+							"name": "filter6"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          wUID as long,",
+						"          ISSN as string,",
+						"          ISSN_L as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Publisher as string,",
+						"          PublisherID as string,",
+						"          ISSN_L_via as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidyIssnLs",
+						"source(output(",
+						"          ISSN as string,",
+						"          ISSN_L as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceissnToissnL",
+						"source(output(",
+						"          APC_ID as long,",
+						"          Title_ID as string,",
+						"          ISSN_L as string,",
+						"          Publisher_Short as string,",
+						"          Publisher_Short_OA as string,",
+						"          Publisher_OA_type as string,",
+						"          Unique_title as string,",
+						"          wUID as long,",
+						"          Import1ID as string,",
+						"          Import2ID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          Model_Notes as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as short,",
+						"          DAO as short,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Import1_Old_Table as string,",
+						"          Import1_Old_wUID as string,",
+						"          Import1_Old_Year as string,",
+						"          Present_via as string,",
+						"          Import2_Old_Table as string,",
+						"          Import2_Old_wUID as string,",
+						"          Import2_Old_Year as string,",
+						"          ISSN_X as string,",
+						"          ISSNs_in_order as string,",
+						"          IY as string,",
+						"          IYP as string,",
+						"          Publication_Data_Year as short,",
+						"          Metrics_Data_Year as short,",
+						"          Currency_Data_Year as short,",
+						"          Inflation_Data_Year as short,",
+						"          last_year_APC as string,",
+						"          years_zero_APC as boolean,",
+						"          last_year_model as string,",
+						"          next_year_model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAPCTidy",
+						"derivedColumn2 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"sourceAPCTidyIssnLs derive(APC_ID = wUID) ~> derivedColumn2",
+						"sourceAPCTidyIssnLs, sourceissnToissnL join(sourceAPCTidyIssnLs@ISSN_L == sourceissnToissnL@ISSN_L,",
+						"     joinType:'right',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"filter1 derive(APC_ID = wUID) ~> derivedColumn3",
+						"join1 filter(not(isNull(sourceAPCTidyIssnLs@ISSN_L))) ~> filter1",
+						"derivedColumn3 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN = sourceissnToissnL@ISSN,",
+						"          ISSN_L = sourceissnToissnL@ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2 aggregate(groupBy(APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L),",
+						"     cnt = count(wUID)) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select3",
+						"select1 aggregate(groupBy(APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L),",
+						"     cnt = count(wUID)) ~> aggregate2",
+						"aggregate2 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select4",
+						"select4, select3 union(byName: true)~> union1",
+						"sourceAPCTidyIssnLs, sourceissnToissnL join(sourceAPCTidyIssnLs@ISSN == sourceissnToissnL@ISSN,",
+						"     joinType:'right',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 filter(not(isNull(sourceAPCTidyIssnLs@ISSN))) ~> filter2",
+						"filter2 derive(APC_ID = wUID) ~> derivedColumn4",
+						"derivedColumn4 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN = sourceissnToissnL@ISSN,",
+						"          ISSN_L = sourceissnToissnL@ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select5",
+						"select5 aggregate(groupBy(APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L),",
+						"     cnt = count(wUID)) ~> aggregate3",
+						"aggregate3 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select6",
+						"union1, select6 union(byName: true)~> union2",
+						"union2 sort(asc(ISSN_L, false)) ~> sort1",
+						"sort1 filter(not(isNull(ISSN)) || ISSN != '0000-0000'",
+						"",
+						"/* not(isNull(ISSN)) || not(isNull(ISSN_L)) || ISSN != '0000-0000' || regexMatch(ISSN,'[0-9]{4}-[0-9]{3}[0-9X]') */) ~> filter3",
+						"lookup1 derive(ISSN_L = TidyIssnL_ISSN_L) ~> UpdateAPCTidywithnewISSNL",
+						"UpdateAPCTidywithnewISSNL select(mapColumn(",
+						"          APC_ID,",
+						"          Title_ID,",
+						"          ISSN_L,",
+						"          Publisher_Short,",
+						"          Publisher_Short_OA,",
+						"          Publisher_OA_type,",
+						"          Unique_title,",
+						"          wUID,",
+						"          Import1ID,",
+						"          Import2ID,",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source_title,",
+						"          Source,",
+						"          Model,",
+						"          Model_Notes,",
+						"          APC,",
+						"          Currency,",
+						"          Year,",
+						"          DAO,",
+						"          LicenseType,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society,",
+						"          TJ,",
+						"          Audit,",
+						"          Import1_Old_Table,",
+						"          Import1_Old_wUID,",
+						"          Import1_Old_Year,",
+						"          Present_via,",
+						"          Import2_Old_Table,",
+						"          Import2_Old_wUID,",
+						"          Import2_Old_Year,",
+						"          ISSN_X,",
+						"          ISSNs_in_order,",
+						"          IY,",
+						"          IYP,",
+						"          Publication_Data_Year,",
+						"          Metrics_Data_Year,",
+						"          Currency_Data_Year,",
+						"          Inflation_Data_Year,",
+						"          last_year_APC,",
+						"          years_zero_APC,",
+						"          last_year_model,",
+						"          next_year_model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectColumnsOfAPCTidy",
+						"filter4 select(mapColumn(",
+						"          TidyIssnL_wUID = wUID,",
+						"          TidyIssnL_ISSN_L = ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectwUIDAndISSNl",
+						"sourceAPCTidyIssnLs filter(not(isNull(ISSN_L))) ~> filter4",
+						"sourceAPCTidy, selectwUIDAndISSNl lookup(wUID == TidyIssnL_wUID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"filter5 aggregate(groupBy(APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L),",
+						"     cnt = count(wUID)) ~> aggregate4",
+						"aggregate4 select(mapColumn(",
+						"          APC_ID,",
+						"          wUID,",
+						"          ISSN,",
+						"          ISSN_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select7",
+						"filter6 filter(regexMatch(ISSN, '^[0-9]{4}-[0-9]{3}[0-9X]$')) ~> filter5",
+						"filter3 filter(not(isNull(ISSN_L))) ~> filter6",
+						"select7 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['APC_Issns.csv'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sinkAPCIssns",
+						"selectColumnsOfAPCTidy sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     partitionFileNames:['APCTidy.csv'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sinkAPCTidy"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_Test_CWTS_Tidy')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_Import_cwts_tidy",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureMySqlcwtsTidyTable",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          Idx as string,",
+						"          Name_Raw as string,",
+						"          Name_Match as string,",
+						"          Name_Punct as string,",
+						"          Name_Abbrev as string,",
+						"          Name_Clean as string,",
+						"          Name_Abbrev_OLD as string,",
+						"          Source as string,",
+						"          Notes as string,",
+						"          done as string,",
+						"          bak as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Idx as long,",
+						"          ISSNs_as_stated as string,",
+						"          ISSNs_in_order as string,",
+						"          ISSN1_as_stated as string,",
+						"          ISSNs_and_title as string,",
+						"          CWTS_ID as string,",
+						"          CWTS_ID_Last_Year as string,",
+						"          Year_wUID as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Type as string,",
+						"          Print_ISSN as string,",
+						"          Electronic_ISSN as string,",
+						"          ASJC_field_IDs as string,",
+						"          Year as integer,",
+						"          Citing_source as integer,",
+						"          P as integer,",
+						"          IPP as string,",
+						"          IPP_lower_bound_ as string,",
+						"          IPP_upper_bound_ as string,",
+						"          SNIP as string,",
+						"          SNIP_lower_bound_ as string,",
+						"          SNIP_upper_bound_ as string,",
+						"          {%_self_cit} as string,",
+						"          Avg_SNIP as string,",
+						"          ISSNs_count as long,",
+						"          ISSN_X as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Seq as long,",
+						"          Rank as long,",
+						"          dense_rank as long,",
+						"          Quartile as string,",
+						"          Best_Quartile as string,",
+						"          Metrics_Data_Year as integer,",
+						"          Model as string,",
+						"          inMarket as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_Thieme_processing')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/bronze to silver/Misc"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_Thieme_bronze_all",
+								"type": "DatasetReference"
+							},
+							"name": "sourceAllJournal"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ls_Thieme_silver_all_journal",
+								"type": "DatasetReference"
+							},
+							"name": "sinkList1AllJournal"
+						}
+					],
+					"transformations": [
+						{
+							"name": "PreparingList1"
+						},
+						{
+							"name": "selectRequiredColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {Journal Title} as string,",
+						"          DOI as string,",
+						"          eISSN as string,",
+						"          {Publishing Model} as string,",
+						"          {Article types} as string,",
+						"          {License Type} as string,",
+						"          {APC Price in US Dollars} as string,",
+						"          {APC Price in Euros} as string,",
+						"          {Discount Type} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> sourceAllJournal",
+						"sourceAllJournal derive(Publisher = 'Thieme',",
+						"          ISSN1 = trim(eISSN),",
+						"          ISSN2 = toString(null()),",
+						"          Title = trim({Journal Title}),",
+						"          Source = 'Publisher Price List',",
+						"          Model = iif(",
+						"    {Publishing Model} == 'Fully OA','Fully OA',",
+						"    iif({Publishing Model} == 'Hybrid OA','Hybrid',",
+						"    'None')",
+						"    ),",
+						"          {Model Notes} = toString(null()),",
+						"          APC = {APC Price in US Dollars},",
+						"          Currency = iif(not(isNull({APC Price in US Dollars})),'USD',''),",
+						"          {License Types} = {License Type},",
+						"          Year = :year_v,",
+						"          PublisherID = toString(null()),",
+						"          JoiningID = toString(null()),",
+						"          Imprint = toString(null()),",
+						"          Society = toString(null()),",
+						"          year_v := '2025') ~> PreparingList1",
+						"PreparingList1 select(mapColumn(",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source,",
+						"          Model,",
+						"          {Model Notes},",
+						"          APC,",
+						"          Currency,",
+						"          {License Types},",
+						"          Year,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectRequiredColumns",
+						"selectRequiredColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          PubType as string,",
+						"          Title as string,",
+						"          OnlineUrl as string,",
+						"          OnlineYear as string,",
+						"          FirstVolume as string,",
+						"          OnlineCode as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkList1AllJournal"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_TypeCast_cwtsTidyTable')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_Import_cwts_tidy",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_Import_cwts_tidy_new",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Idx as short,",
+						"          ISSNs_as_stated as string,",
+						"          ISSNs_in_order as string,",
+						"          ISSN1_as_stated as string,",
+						"          ISSNs_and_title as string,",
+						"          CWTS_ID as string,",
+						"          CWTS_ID_Last_Year as string,",
+						"          Year_wUID as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Type as string,",
+						"          Print_ISSN as string,",
+						"          Electronic_ISSN as string,",
+						"          ASJC_field_IDs as string,",
+						"          Year as short,",
+						"          Citing_source as boolean,",
+						"          P as short,",
+						"          IPP as double,",
+						"          IPP_lower_bound_ as double,",
+						"          IPP_upper_bound_ as double,",
+						"          SNIP as double,",
+						"          SNIP_lower_bound_ as double,",
+						"          SNIP_upper_bound_ as double,",
+						"          {%_self_cit} as string,",
+						"          Avg_SNIP as string,",
+						"          ISSNs_count as short,",
+						"          ISSN_X as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Seq as short,",
+						"          Rank as short,",
+						"          dense_rank as short,",
+						"          Quartile as string,",
+						"          Best_Quartile as string,",
+						"          Metrics_Data_Year as short,",
+						"          Model as string,",
+						"          inMarket as boolean",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"derivedColumn1 select(mapColumn(",
+						"          Idx,",
+						"          ISSNs_as_stated,",
+						"          ISSNs_in_order,",
+						"          ISSN1_as_stated,",
+						"          ISSNs_and_title,",
+						"          CWTS_ID,",
+						"          CWTS_ID_Last_Year,",
+						"          Year_wUID,",
+						"          Title,",
+						"          Source_title,",
+						"          Type,",
+						"          Print_ISSN,",
+						"          Electronic_ISSN,",
+						"          ASJC_field_IDs,",
+						"          Year,",
+						"          Citing_source,",
+						"          P,",
+						"          IPP,",
+						"          IPP_lower_bound_,",
+						"          IPP_upper_bound_,",
+						"          SNIP,",
+						"          SNIP_lower_bound_,",
+						"          SNIP_upper_bound_,",
+						"          {%_self_cit},",
+						"          Avg_SNIP,",
+						"          ISSNs_count,",
+						"          ISSN_X,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Seq,",
+						"          Rank,",
+						"          dense_rank,",
+						"          Quartile,",
+						"          Best_Quartile,",
+						"          Metrics_Data_Year,",
+						"          Model,",
+						"          inMarket",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"source1 derive(ISSNs_count = toInteger(ISSNs_count),",
+						"          Seq = toInteger(Seq),",
+						"          Rank = toInteger(Rank),",
+						"          dense_rank = toInteger(dense_rank),",
+						"          Citing_source = toInteger(iif(toString(Citing_source) == \"true\", 1, 0))\r",
+						"/* toString(Citing_source)*/,",
+						"          inMarket = toString(iif(toString(inMarket) == \"true\", 1, 0))) ~> derivedColumn1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Idx as string,",
+						"          Name_Raw as string,",
+						"          Name_Match as string,",
+						"          Name_Punct as string,",
+						"          Name_Abbrev as string,",
+						"          Name_Clean as string,",
+						"          Name_Abbrev_OLD as string,",
+						"          Source as string,",
+						"          Notes as string,",
+						"          done as string,",
+						"          bak as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     format: 'table') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_TypeCast_cwtsTidyTable_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_Import_cwts_tidy",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureMySqlcwtsTidyTable",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Idx as short,",
+						"          ISSNs_as_stated as string,",
+						"          ISSNs_in_order as string,",
+						"          ISSN1_as_stated as string,",
+						"          ISSNs_and_title as string,",
+						"          CWTS_ID as string,",
+						"          CWTS_ID_Last_Year as string,",
+						"          Year_wUID as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Type as string,",
+						"          Print_ISSN as string,",
+						"          Electronic_ISSN as string,",
+						"          ASJC_field_IDs as string,",
+						"          Year as short,",
+						"          Citing_source as boolean,",
+						"          P as short,",
+						"          IPP as double,",
+						"          IPP_lower_bound_ as double,",
+						"          IPP_upper_bound_ as double,",
+						"          SNIP as double,",
+						"          SNIP_lower_bound_ as double,",
+						"          SNIP_upper_bound_ as double,",
+						"          {%_self_cit} as string,",
+						"          Avg_SNIP as string,",
+						"          ISSNs_count as short,",
+						"          ISSN_X as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Seq as short,",
+						"          Rank as short,",
+						"          dense_rank as short,",
+						"          Quartile as string,",
+						"          Best_Quartile as string,",
+						"          Metrics_Data_Year as short,",
+						"          Model as string,",
+						"          inMarket as boolean",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"derivedColumn1 select(mapColumn(",
+						"          Idx,",
+						"          ISSNs_as_stated,",
+						"          ISSNs_in_order,",
+						"          ISSN1_as_stated,",
+						"          ISSNs_and_title,",
+						"          CWTS_ID,",
+						"          CWTS_ID_Last_Year,",
+						"          Year_wUID,",
+						"          Title,",
+						"          Source_title,",
+						"          Type,",
+						"          Print_ISSN,",
+						"          Electronic_ISSN,",
+						"          ASJC_field_IDs,",
+						"          Year,",
+						"          Citing_source,",
+						"          P,",
+						"          IPP,",
+						"          IPP_lower_bound_,",
+						"          IPP_upper_bound_,",
+						"          SNIP,",
+						"          SNIP_lower_bound_,",
+						"          SNIP_upper_bound_,",
+						"          {%_self_cit},",
+						"          Avg_SNIP,",
+						"          ISSNs_count,",
+						"          ISSN_X,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Seq,",
+						"          Rank,",
+						"          dense_rank,",
+						"          Quartile,",
+						"          Best_Quartile,",
+						"          Metrics_Data_Year,",
+						"          Model,",
+						"          inMarket",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"source1 derive(ISSNs_count = toInteger(ISSNs_count),",
+						"          Seq = toInteger(Seq),",
+						"          Rank = toInteger(Rank),",
+						"          dense_rank = toInteger(dense_rank),",
+						"          Citing_source = toInteger(iif(toString(Citing_source) == \"true\", 1, 0))\r",
+						"/* toString(Citing_source)*/,",
+						"          inMarket = toString(iif(toString(inMarket) == \"true\", 1, 0))) ~> derivedColumn1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Idx as long,",
+						"          ISSNs_as_stated as string,",
+						"          ISSNs_in_order as string,",
+						"          ISSN1_as_stated as string,",
+						"          ISSNs_and_title as string,",
+						"          CWTS_ID as string,",
+						"          CWTS_ID_Last_Year as string,",
+						"          Year_wUID as string,",
+						"          Title as string,",
+						"          Source_title as string,",
+						"          Type as string,",
+						"          Print_ISSN as string,",
+						"          Electronic_ISSN as string,",
+						"          ASJC_field_IDs as string,",
+						"          Year as integer,",
+						"          Citing_source as integer,",
+						"          P as integer,",
+						"          IPP as string,",
+						"          IPP_lower_bound_ as string,",
+						"          IPP_upper_bound_ as string,",
+						"          SNIP as string,",
+						"          SNIP_lower_bound_ as string,",
+						"          SNIP_upper_bound_ as string,",
+						"          {%_self_cit} as string,",
+						"          Avg_SNIP as string,",
+						"          ISSNs_count as long,",
+						"          ISSN_X as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Seq as long,",
+						"          Rank as long,",
+						"          dense_rank as long,",
+						"          Quartile as string,",
+						"          Best_Quartile as string,",
+						"          Metrics_Data_Year as integer,",
+						"          Model as string,",
+						"          inMarket as integer",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_apa_processing')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "apc/bronze to silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apa_kbart",
+								"type": "DatasetReference"
+							},
+							"name": "Kbart"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_apa_silver",
+								"type": "DatasetReference"
+							},
+							"name": "apaSilver"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedimportColumns"
+						},
+						{
+							"name": "selectColummns"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "takeActiveOne"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          publication_title as string,",
+						"          print_identifier as string,",
+						"          online_identifier as string,",
+						"          date_first_issue_online as string,",
+						"          num_first_vol_online as string,",
+						"          num_first_issue_online as string,",
+						"          date_last_issue_online as string,",
+						"          num_last_vol_online as string,",
+						"          num_last_issue_online as string,",
+						"          title_url as string,",
+						"          first_author as string,",
+						"          title_id as string,",
+						"          embargo_info as string,",
+						"          coverage_depth as string,",
+						"          coverage_notes as string,",
+						"          publisher_name as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Kbart",
+						"takeActiveOne derive(Publisher = :publisher_v,",
+						"          ISSN1 = print_identifier,",
+						"          ISSN2 = online_identifier,",
+						"          Title = publication_title,",
+						"          Source = :source_v,",
+						"          Model = :modle_v,",
+						"          {Model Notes} = :model_notes_v,",
+						"          APC = :apc_v,",
+						"          Currency = :currency_v,",
+						"          {License Types} = :license_types_v,",
+						"          Year = :year_v,",
+						"          PublisherID = title_id,",
+						"          JoiningID = title_id,",
+						"          Imprint = publisher_name,",
+						"          publisher_v := \"American Psychological Association (APA)\",",
+						"          source_v := \"Publisher Website via Misc Publisher APCs list\",",
+						"          modle_v := \"Hybrid\",",
+						"          model_notes_v := \"Wellcome & UKRI authors only. $3k APC for APA ©\",",
+						"          apc_v := \"3000\",",
+						"          currency_v := \"USD\",",
+						"          license_types_v := \"CC BY, CC BY-NC-ND\",",
+						"          year_v := \"2025\") ~> derivedimportColumns",
+						"derivedColumn1 select(mapColumn(",
+						"          Publisher,",
+						"          ISSN1,",
+						"          ISSN2,",
+						"          Title,",
+						"          Source,",
+						"          Model,",
+						"          {Model Notes},",
+						"          APC,",
+						"          Currency,",
+						"          {License Types},",
+						"          Year,",
+						"          PublisherID,",
+						"          JoiningID,",
+						"          Imprint,",
+						"          Society",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectColummns",
+						"derivedimportColumns derive(Society = iif((print_identifier == '0008-400X' || print_identifier == '1196-1961' || print_identifier == '0708-5591'), 'Canadian Psychological Association', ",
+						"iif (print_identifier == toString('0586-7614'), 'National Institute of Health', 'American Psychological Association (APA)'))) ~> derivedColumn1",
+						"Kbart filter(isNull(date_last_issue_online)) ~> takeActiveOne",
+						"selectColummns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> apaSilver"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_ms_crossref_Tidy_import')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ms_crossrefTidy_csv",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_ms_crossrefTidy_csv_processed",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          JournalTitle as string,",
+						"          Crossref_ID as integer,",
+						"          Publisher as string,",
+						"          pissn as string,",
+						"          eissn as string,",
+						"          additionalIssns as string,",
+						"          doi as string,",
+						"          issue_info as string,",
+						"          DAO as string,",
+						"          CleanedTitle as string,",
+						"          AbbrevTitle as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"derivedColumn1 select(mapColumn(",
+						"          JournalTitle,",
+						"          Crossref_ID,",
+						"          Publisher,",
+						"          pissn,",
+						"          eissn,",
+						"          additionalIssns,",
+						"          doi,",
+						"          issue_info,",
+						"          DAO = new_dao,",
+						"          CleanedTitle = new_cleanedTitle,",
+						"          AbbrevTitle = new_AbbrevTitle",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"source1 derive(new_dao = iif(\r",
+						"   !isNull(toInteger(substring(DAO,1,4))) \r",
+						"   && toInteger(substring(DAO,1,4)) >= 1900 \r",
+						"   && toInteger(substring(DAO,1,4)) <= 2100,\r",
+						"   substring(DAO,1,16),   \r",
+						"   toString(null())\r",
+						"),",
+						"          new_cleanedTitle = substring(CleanedTitle, 1, 255),",
+						"          new_AbbrevTitle = substring(AbbrevTitle, 1, 255)) ~> derivedColumn1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          JournalTitle as string,",
+						"          JournalID as string,",
+						"          Publisher as string,",
+						"          pissn as string,",
+						"          eissn as string,",
+						"          additionalIssns as string,",
+						"          doi as string,",
+						"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_ms_crossref_import_currentyear')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_ms_crossrefImport_currentyear",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_ms_crossref_import_currentYear_processed",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "filter1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          JournalTitle as string,",
+						"          JournalID as string,",
+						"          Publisher as string,",
+						"          pissn as string,",
+						"          eissn as string,",
+						"          additionalIssns as string,",
+						"          doi as string,",
+						"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"filter1 select(mapColumn(",
+						"          JournalTitle,",
+						"          JournalID,",
+						"          Publisher,",
+						"          pissn,",
+						"          eissn,",
+						"          additionalIssns,",
+						"          doi,",
+						"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5}",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"source1 filter(length(pissn) < 10 && isInteger(JournalID)) ~> filter1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          JournalTitle as string,",
+						"          JournalID as string,",
+						"          Publisher as string,",
+						"          pissn as string,",
+						"          eissn as string,",
+						"          additionalIssns as string,",
+						"          doi as string,",
+						"          {(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5} as string",
+						"     ),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/import_2024_apcImport1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "generic"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_import1_2024",
+								"type": "DatasetReference"
+							},
+							"name": "apcImport12024Source"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_apcimport1",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          wUID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as string,",
+						"          DAO as string,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Old_Table as string,",
+						"          Old_wUID as string,",
+						"          Old_Year as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> apcImport12024Source",
+						"apcImport12024Source sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('key',",
+						"          0,",
+						"          DAO,",
+						"          Publisher",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/import_2024_apcImport2')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "generic"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_apc_import2_2024",
+								"type": "DatasetReference"
+							},
+							"name": "apcImport12024Source"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_gold_apcimport2",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          wUID as string,",
+						"          Publisher as string,",
+						"          ISSN1 as string,",
+						"          ISSN2 as string,",
+						"          Title as string,",
+						"          Source as string,",
+						"          Model as string,",
+						"          {Model Notes} as string,",
+						"          APC as string,",
+						"          Currency as string,",
+						"          Year as string,",
+						"          DAO as string,",
+						"          LicenseType as string,",
+						"          PublisherID as string,",
+						"          JoiningID as string,",
+						"          Imprint as string,",
+						"          Society as string,",
+						"          TJ as string,",
+						"          Audit as string,",
+						"          Old_Table as string,",
+						"          Old_wUID as string,",
+						"          Old_Year as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> apcImport12024Source",
+						"apcImport12024Source sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('key',",
+						"          0,",
+						"          DAO,",
+						"          Publisher",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/01_Elsevier_Silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy All journals from Web",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_elsevier_all_journal_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_elsevier_all_journal",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy OA Journals from web",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "HttpReadSettings",
+									"requestMethod": "GET"
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_elsevier_oa_journal_from_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_elsevier_oa_journal",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "convert excel to csv",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Copy All journals from Web",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Copy OA Journals from web",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "01_Elsevier_Bronze_Composer",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Generate Silver data",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "convert excel to csv",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "01_df_elsevier_processing",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"sourceKbart": {},
+									"sourceAllJournals": {},
+									"sourceOAJournals": {},
+									"sinkAllJournalsList1": {},
+									"sinkOAJournalsList2": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Data cleanup",
+						"type": "SynapseNotebook",
+						"dependsOn": [
+							{
+								"activity": "Generate Silver data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": {
+									"value": "01_Elsevier_Silver_DataCleanup",
+									"type": "Expression"
+								},
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": {
+									"value": "oadatSparkPook",
+									"type": "Expression"
+								},
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						},
+						"linkedServiceName": {
+							"referenceName": "dl_oadat_AzureSynapseArtifacts",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Generic/Silver_Publisher_Pipelines/Major"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-11-20T15:10:47Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

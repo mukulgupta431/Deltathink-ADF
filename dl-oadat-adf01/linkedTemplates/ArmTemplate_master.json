@@ -1,0 +1,639 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		},
+		"AmazonS31_secretAccessKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'secretAccessKey' of 'AmazonS31'"
+		},
+		"AzureMySql1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureMySql1'"
+		},
+		"ls_oadat_storage_gen2_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_oadat_storage_gen2'"
+		},
+		"ls_odat_storage_gen2_v1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_odat_storage_gen2_v1'"
+		},
+		"ls_openalex_secretAccessKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'secretAccessKey' of 'ls_openalex'"
+		},
+		"AmazonS31_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "dummy"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "oadat-workspace.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "master"
+		},
+		"MS_CrossRef_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "http://ftp.crossref.org/titlelist/titleFile.csv"
+		},
+		"dl_oadat_AzureSynapseArtifacts_properties_typeProperties_endpoint": {
+			"type": "string",
+			"defaultValue": "https://oadat-workspace.dev.azuresynapse.net"
+		},
+		"ls_AIP_Kbart_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://publishing.aip.org/kbart_aip_journals/"
+		},
+		"ls_IEEE_org_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ieeexplore.ieee.org"
+		},
+		"ls_SpringerNature_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://resource-cms.springernature.com/"
+		},
+		"ls_acm_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dl.acm.org"
+		},
+		"ls_apa_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://supp.apa.org"
+		},
+		"ls_aps_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://librarians.aps.org"
+		},
+		"ls_asme_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asmedigitalcollection.asme.org"
+		},
+		"ls_cup_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://assets.ctfassets.net"
+		},
+		"ls_degruyter_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://degruyter-live-craftcms-assets.s3.amazonaws.com"
+		},
+		"ls_elsevier_legacyfileshare_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://legacyfileshare.elsevier.com"
+		},
+		"ls_elsevier_main_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.elsevier.com"
+		},
+		"ls_emerald_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://www.emeraldgrouppublishing.com"
+		},
+		"ls_ioPP_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://publishingsupport.iopscience.iop.org"
+		},
+		"ls_mayy_ann_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://home.liebertpub.com/librarians/spreadsheet"
+		},
+		"ls_oadat_storage_gen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dloadatdl.dfs.core.windows.net/"
+		},
+		"ls_odat_storage_gen2_v1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dloadatdl.dfs.core.windows.net/"
+		},
+		"ls_open_ieee_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://open.ieee.org"
+		},
+		"ls_openalex_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "t"
+		},
+		"ls_oup_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://fdslive.oup.com"
+		},
+		"ls_sagepub_web_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://us.sagepub.com/"
+		},
+		"ls_thieme_web_asset_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cdn0.scrvt.com/"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AmazonS31_secretAccessKey": {
+						"value": "[parameters('AmazonS31_secretAccessKey')]"
+					},
+					"AzureMySql1_connectionString": {
+						"value": "[parameters('AzureMySql1_connectionString')]"
+					},
+					"ls_oadat_storage_gen2_accountKey": {
+						"value": "[parameters('ls_oadat_storage_gen2_accountKey')]"
+					},
+					"AmazonS31_properties_typeProperties_accessKeyId": {
+						"value": "[parameters('AmazonS31_properties_typeProperties_accessKeyId')]"
+					},
+					"AzureSqlDatabase1_properties_typeProperties_server": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_server')]"
+					},
+					"AzureSqlDatabase1_properties_typeProperties_database": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_database')]"
+					},
+					"MS_CrossRef_properties_typeProperties_url": {
+						"value": "[parameters('MS_CrossRef_properties_typeProperties_url')]"
+					},
+					"dl_oadat_AzureSynapseArtifacts_properties_typeProperties_endpoint": {
+						"value": "[parameters('dl_oadat_AzureSynapseArtifacts_properties_typeProperties_endpoint')]"
+					},
+					"ls_AIP_Kbart_properties_typeProperties_url": {
+						"value": "[parameters('ls_AIP_Kbart_properties_typeProperties_url')]"
+					},
+					"ls_IEEE_org_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_IEEE_org_web_properties_typeProperties_url')]"
+					},
+					"ls_SpringerNature_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_SpringerNature_web_properties_typeProperties_url')]"
+					},
+					"ls_acm_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_acm_web_properties_typeProperties_url')]"
+					},
+					"ls_apa_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_apa_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_aps_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_aps_web_properties_typeProperties_url')]"
+					},
+					"ls_asme_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_asme_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_cup_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_cup_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_degruyter_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_degruyter_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_elsevier_legacyfileshare_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_elsevier_legacyfileshare_web_properties_typeProperties_url')]"
+					},
+					"ls_elsevier_main_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_elsevier_main_web_properties_typeProperties_url')]"
+					},
+					"ls_emerald_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_emerald_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_ioPP_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_ioPP_web_properties_typeProperties_url')]"
+					},
+					"ls_mayy_ann_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_mayy_ann_web_properties_typeProperties_url')]"
+					},
+					"ls_oadat_storage_gen2_properties_typeProperties_url": {
+						"value": "[parameters('ls_oadat_storage_gen2_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_odat_storage_gen2_v1_accountKey": {
+						"value": "[parameters('ls_odat_storage_gen2_v1_accountKey')]"
+					},
+					"ls_openalex_secretAccessKey": {
+						"value": "[parameters('ls_openalex_secretAccessKey')]"
+					},
+					"ls_odat_storage_gen2_v1_properties_typeProperties_url": {
+						"value": "[parameters('ls_odat_storage_gen2_v1_properties_typeProperties_url')]"
+					},
+					"ls_open_ieee_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_open_ieee_web_properties_typeProperties_url')]"
+					},
+					"ls_openalex_properties_typeProperties_accessKeyId": {
+						"value": "[parameters('ls_openalex_properties_typeProperties_accessKeyId')]"
+					},
+					"ls_oup_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_oup_web_asset_properties_typeProperties_url')]"
+					},
+					"ls_sagepub_web_properties_typeProperties_url": {
+						"value": "[parameters('ls_sagepub_web_properties_typeProperties_url')]"
+					},
+					"ls_thieme_web_asset_properties_typeProperties_url": {
+						"value": "[parameters('ls_thieme_web_asset_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_2')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_3')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_5",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_5.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_4')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_6",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_6.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_5')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_7",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_7.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_6')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_8",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_8.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_7')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_9",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_9.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_8')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_10",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_10.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_9')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_11",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_11.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_10')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_12",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_12.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_11')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_13",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_13.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_12')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_14",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_14.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_13')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_15",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_15.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_14')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_16",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_16.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_15')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_17",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_17.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_16')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_18",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_18.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_17')]"
+			]
+		},
+		{
+			"name": "dl-oadat-adf01_ArmTemplate_19",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_19.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'dl-oadat-adf01_ArmTemplate_18')]"
+			]
+		}
+	]
+}

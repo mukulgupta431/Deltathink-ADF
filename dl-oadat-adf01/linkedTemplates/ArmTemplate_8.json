@@ -1,0 +1,1057 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dl-oadat-adf01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_marry_ann_bronze_all')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/18_Mary Ann Liebert"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Mary Ann Liebert/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mary_ann_broze_oa')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/18_Mary Ann Liebert"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/Mary Ann Liebert/oa",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "title",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mit_all_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/02_Silver layer/Misc/20 MIT Press"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "silver/MIT Press/all",
+						"fileSystem": "apc"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mit_press_diamond_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/20 MIT Press"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/MIT Press/diamondOA",
+						"fileSystem": "apc"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"diamond_open_access_journals": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string"
+									},
+									"title_url": {
+										"type": "string"
+									},
+									"Online_ISSN": {
+										"type": "string"
+									},
+									"Print_ISSN": {
+										"type": "null"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mit_press_gold_oa_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/20 MIT Press"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/MIT Press/goldOA",
+						"fileSystem": "apc"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"gold_open_access_journals": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string"
+									},
+									"title_url": {
+										"type": "string"
+									},
+									"Online_ISSN": {
+										"type": "string"
+									},
+									"Print_ISSN": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_mit_press_hybrid_journals')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "apc/01_Bronze layer/Misc/20 MIT Press"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "bronze/MIT Press/hybrid",
+						"fileSystem": "apc"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"hybrid_open_access_journals": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"title": {
+										"type": "string"
+									},
+									"title_url": {
+										"type": "string"
+									},
+									"Online_ISSN": {
+										"type": "string"
+									},
+									"Print_ISSN": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_APC_Tidy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_APC_tidy_20250915_1709GMT+5:30.csv",
+						"folderPath": "apc_tidy",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_Bielefeld_Gold')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Bielefeld_Gold_20250919_1424GMT+5:30.csv",
+						"folderPath": "Bielefeld_Gold",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_CrossRef_http')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "MS_CrossRef",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_Society_Title_Raw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Society_Titles_Raw_20250909_0933BST.csv",
+						"folderPath": "Society_Titles_Raw",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_Unpaywall_DOIs_tidy_TABLE')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Unpaywall_DOIs_tidy_20250915_1245GMT+5:30.csv",
+						"folderPath": "Unpaywall_DOIs_tidy",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Idx",
+						"type": "String"
+					},
+					{
+						"name": "Name_Raw",
+						"type": "String"
+					},
+					{
+						"name": "Name_Match",
+						"type": "String"
+					},
+					{
+						"name": "Name_Punct",
+						"type": "String"
+					},
+					{
+						"name": "Name_Abbrev",
+						"type": "String"
+					},
+					{
+						"name": "Name_Clean",
+						"type": "String"
+					},
+					{
+						"name": "Name_Abbrev_OLD",
+						"type": "String"
+					},
+					{
+						"name": "Source",
+						"type": "String"
+					},
+					{
+						"name": "Notes",
+						"type": "String"
+					},
+					{
+						"name": "done",
+						"type": "String"
+					},
+					{
+						"name": "bak",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_Unpaywall_Titles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_Unpaywall_Titles_20250917_1509GMT+5:30.csv",
+						"folderPath": "Unpaywall_titles",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_crossrefImport_currentyear')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "titleFile (2).csv",
+						"folderPath": "MS_Crossref_tidy",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "String"
+					},
+					{
+						"name": "JournalID",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "pissn",
+						"type": "String"
+					},
+					{
+						"name": "eissn",
+						"type": "String"
+					},
+					{
+						"name": "additionalIssns",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_crossrefTidy_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "OADAT_dataprep_CrossRef_tidy_20250819_1313GMT+5:30.csv",
+						"folderPath": "MS_Crossref_tidy/old data",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "String"
+					},
+					{
+						"name": "JournalID",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "pissn",
+						"type": "String"
+					},
+					{
+						"name": "eissn",
+						"type": "String"
+					},
+					{
+						"name": "additionalIssns",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_crossrefTidy_csv_processed')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "MS_Crossref_tidy/old data/processed",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "String"
+					},
+					{
+						"name": "JournalID",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "pissn",
+						"type": "String"
+					},
+					{
+						"name": "eissn",
+						"type": "String"
+					},
+					{
+						"name": "additionalIssns",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_crossref_import_currentYear_processed')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "MS_Crossref_tidy/processed/currentYear",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "String"
+					},
+					{
+						"name": "JournalID",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "pissn",
+						"type": "String"
+					},
+					{
+						"name": "eissn",
+						"type": "String"
+					},
+					{
+						"name": "additionalIssns",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_doi_sources')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/OpenAlex"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed/sources",
+						"fileSystem": "openalex"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "sources_id",
+						"type": "String"
+					},
+					{
+						"name": "type",
+						"type": "String"
+					},
+					{
+						"name": "issn_l",
+						"type": "String"
+					},
+					{
+						"name": "issn_l_as_stated",
+						"type": "String"
+					},
+					{
+						"name": "issns",
+						"type": "String"
+					},
+					{
+						"name": "issns_as_stated",
+						"type": "String"
+					},
+					{
+						"name": "country_code",
+						"type": "String"
+					},
+					{
+						"name": "publisher_ID",
+						"type": "String"
+					},
+					{
+						"name": "publisher",
+						"type": "String"
+					},
+					{
+						"name": "publisher_old",
+						"type": "String"
+					},
+					{
+						"name": "publisher_lineage",
+						"type": "String"
+					},
+					{
+						"name": "display_name",
+						"type": "String"
+					},
+					{
+						"name": "name_as_stated",
+						"type": "String"
+					},
+					{
+						"name": "abbreviated_title",
+						"type": "String"
+					},
+					{
+						"name": "alternate_titles",
+						"type": "String"
+					},
+					{
+						"name": "is_oa",
+						"type": "String"
+					},
+					{
+						"name": "is_in_doaj",
+						"type": "String"
+					},
+					{
+						"name": "works_count",
+						"type": "String"
+					},
+					{
+						"name": "cited_by_count",
+						"type": "String"
+					},
+					{
+						"name": "if2y",
+						"type": "String"
+					},
+					{
+						"name": "h_index",
+						"type": "String"
+					},
+					{
+						"name": "i10_index",
+						"type": "String"
+					},
+					{
+						"name": "counts_by_year",
+						"type": "String"
+					},
+					{
+						"name": "apc_usd_doaj",
+						"type": "String"
+					},
+					{
+						"name": "updated_date",
+						"type": "String"
+					},
+					{
+						"name": "created_date",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_doi_tidy')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/OpenAlex"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed_v1/doi_tidy",
+						"fileSystem": "openalex"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "DOI_tidy_ID",
+						"type": "INT64"
+					},
+					{
+						"name": "year",
+						"type": "UTF8"
+					},
+					{
+						"name": "type",
+						"type": "UTF8"
+					},
+					{
+						"name": "type_crossref",
+						"type": "UTF8"
+					},
+					{
+						"name": "sources_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "sources_id_as_stated",
+						"type": "UTF8"
+					},
+					{
+						"name": "issn_l",
+						"type": "UTF8"
+					},
+					{
+						"name": "issn_l_as_stated",
+						"type": "UTF8"
+					},
+					{
+						"name": "oa_status",
+						"type": "UTF8"
+					},
+					{
+						"name": "license",
+						"type": "UTF8"
+					},
+					{
+						"name": "version",
+						"type": "UTF8"
+					},
+					{
+						"name": "host_type",
+						"type": "UTF8"
+					},
+					{
+						"name": "Is_Article",
+						"type": "INT32"
+					},
+					{
+						"name": "Articles",
+						"type": "INT64"
+					},
+					{
+						"name": "cited_by_count",
+						"type": "INT64"
+					},
+					{
+						"name": "cited_works_count",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_doi_tidy_topics')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing/OpenAlex"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "processed_v1/doi_tidy_topics",
+						"fileSystem": "openalex"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "DOI_tidy_ID",
+						"type": "INT64"
+					},
+					{
+						"name": "topic_id",
+						"type": "UTF8"
+					},
+					{
+						"name": "score",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "n",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_ms_load_CWTS_Import')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_oadat_storage_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "MarketSizing"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "CWTS_Import",
+						"fileSystem": "general"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "JournalTitle",
+						"type": "String"
+					},
+					{
+						"name": "JournalID",
+						"type": "String"
+					},
+					{
+						"name": "Publisher",
+						"type": "String"
+					},
+					{
+						"name": "pissn",
+						"type": "String"
+					},
+					{
+						"name": "eissn",
+						"type": "String"
+					},
+					{
+						"name": "additionalIssns",
+						"type": "String"
+					},
+					{
+						"name": "doi",
+						"type": "String"
+					},
+					{
+						"name": "(year1)[volume1]issue1,issue2,issue3(year2)[volume2]issue4,issues5",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		}
+	]
+}
