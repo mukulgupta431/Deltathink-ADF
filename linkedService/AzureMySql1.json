@@ -5,8 +5,8 @@
 		"annotations": [],
 		"type": "AzureMySql",
 		"typeProperties": {
-			"connectionString": "server=oadatdbdev.mysql.database.azure.com;port=3306;database=oadat_dataprep;uid=oadatAdmin;sslmode=1;usesystemtruststore=0;Connect Timeout=30;DefaultCommandTimeout=1200",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDMxMjdDMTkyLTczMkMtNEJCOS1BQ0YwLTREQTUwNDg5NjI1NV9mODhhNTM3ZC0zZTdkLTRjMGQtYTZiMy1kMjg1MGFiNGI4ZWMiDQp9"
+			"connectionString": "server=oadatdbdev01.mysql.database.azure.com;port=3306;database=oadat_dataprep;uid=oadatAdmin;sslmode=1;usesystemtruststore=0;connect timeout=30;defaultcommandtimeout=1200",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDg3NEVBNkQ2LTZCQzEtNEJCMy05RUJFLUJDRTc1MDM1RTI3Rl9mYjQ3MjExYy0xNjEwLTRhNTUtODA5ZC01N2VjNTIzZmQyMTAiDQp9"
 		}
 	}
 }
