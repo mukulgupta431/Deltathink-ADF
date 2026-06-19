@@ -24,7 +24,7 @@
 			"value": "dummy"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_server": {
-			"value": "oadat-workspace.database.windows.net"
+			"value": "oadat-workspace01.database.windows.net"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_database": {
 			"value": "master"

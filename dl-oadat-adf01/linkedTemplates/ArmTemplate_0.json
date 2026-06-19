@@ -25,7 +25,7 @@
 		},
 		"AzureSqlDatabase1_properties_typeProperties_server": {
 			"type": "string",
-			"defaultValue": "oadat-workspace.database.windows.net"
+			"defaultValue": "oadat-workspace01.database.windows.net"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_database": {
 			"type": "string",
